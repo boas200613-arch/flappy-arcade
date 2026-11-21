@@ -1,0 +1,991 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flappy Arcade — Admin</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #090d18;
+  --panel: #111827;
+  --panel2: #182235;
+  --border: #26334a;
+  --text: #f4f7ff;
+  --muted: #8290a8;
+  --blue: #4388ff;
+  --green: #27d69b;
+  --red: #ff5570;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+}
+
+button, input, select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+}
+
+.login {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg);
+}
+
+.login-card {
+  width: min(390px, 90%);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 35px;
+  text-align: center;
+}
+
+.logo {
+  font-size: 25px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 25px;
+}
+
+input, select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: #0c1423;
+  color: white;
+  outline: none;
+  margin-bottom: 12px;
+}
+
+input:focus, select:focus {
+  border-color: var(--blue);
+}
+
+.primary {
+  background: var(--blue);
+  color: white;
+  padding: 13px 18px;
+  border-radius: 9px;
+  font-weight: bold;
+}
+
+.primary:hover {
+  filter: brightness(1.12);
+}
+
+.login .primary {
+  width: 100%;
+}
+
+.error {
+  color: var(--red);
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.app {
+  display: none;
+  height: 100vh;
+}
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 225px;
+  padding: 25px 15px;
+  background: #0d1422;
+  border-right: 1px solid var(--border);
+}
+
+.brand {
+  font-size: 19px;
+  font-weight: 800;
+  padding: 5px 12px 35px;
+}
+
+.brand span {
+  color: var(--blue);
+}
+
+.nav-label {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 0 12px;
+  margin-bottom: 12px;
+}
+
+.nav button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: var(--muted);
+  padding: 14px 13px;
+  border-radius: 9px;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.nav button.active,
+.nav button:hover {
+  background: #1b2b47;
+  color: white;
+}
+
+.sidebar-bottom {
+  position: absolute;
+  bottom: 20px;
+  left: 15px;
+  right: 15px;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 12px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.logout {
+  width: 100%;
+  padding: 12px;
+  color: var(--red);
+  background: #291723;
+  border-radius: 9px;
+}
+
+.main {
+  margin-left: 225px;
+  height: 100vh;
+  padding: 30px;
+  overflow: hidden;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.topbar h1 {
+  font-size: 25px;
+}
+
+.topbar p {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.admin-tag {
+  background: #172b49;
+  color: #7eafff;
+  border: 1px solid #284a79;
+  padding: 9px 13px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.screen {
+  display: none;
+  height: calc(100vh - 115px);
+}
+
+.screen.active {
+  display: block;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+}
+
+.stat p {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 13px;
+}
+
+.stat h2 {
+  font-size: 30px;
+}
+
+.stat .blue { color: var(--blue); }
+.stat .green { color: var(--green); }
+.stat .red { color: var(--red); }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 16px;
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.panel-heading h2 {
+  font-size: 16px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th {
+  color: var(--muted);
+  font-weight: normal;
+  text-align: left;
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table td {
+  padding: 14px 8px;
+  border-bottom: 1px solid #202c40;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 25px;
+  font-size: 13px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+}
+
+.online {
+  background: #12352d;
+  color: var(--green);
+}
+
+.banned {
+  background: #391b27;
+  color: var(--red);
+}
+
+.action {
+  background: #263a5c;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 7px;
+  font-size: 12px;
+}
+
+.danger {
+  background: #421d2a;
+  color: #ff8a9d;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.form-grid input,
+.form-grid select {
+  margin-bottom: 0;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.message {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 13px;
+  min-height: 16px;
+}
+
+.settings-info {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+@media(max-width: 700px) {
+  .sidebar {
+    width: 68px;
+    padding: 15px 7px;
+  }
+
+  .brand {
+    font-size: 0;
+    padding: 8px 10px 30px;
+  }
+
+  .brand span {
+    font-size: 20px;
+  }
+
+  .nav-label,
+  .nav button span,
+  .status,
+  .logout {
+    display: none;
+  }
+
+  .nav button {
+    text-align: center;
+    padding: 14px 5px;
+    font-size: 19px;
+  }
+
+  .main {
+    margin-left: 68px;
+    padding: 18px 12px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .stat {
+    padding: 13px;
+  }
+
+  .stat h2 {
+    font-size: 22px;
+  }
+
+  .topbar h1 {
+    font-size: 19px;
+  }
+
+  .admin-tag {
+    font-size: 10px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full {
+    grid-column: auto;
+  }
+
+  .table {
+    font-size: 11px;
+  }
+
+  .table th,
+  .table td {
+    padding: 10px 4px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="login" id="login">
+  <div class="login-card">
+    <div class="logo">FLAPPY <span style="color:#4388ff">ARCADE</span></div>
+    <div class="subtitle">ADMIN CONTROL PANEL</div>
+
+    <input id="adminCode" type="password"
+      placeholder="Enter admin code">
+
+    <button class="primary" onclick="loginAdmin()">
+      ACCESS PANEL
+    </button>
+
+    <div class="error" id="loginError"></div>
+  </div>
+</div>
+
+<div class="app" id="app">
+
+  <aside class="sidebar">
+    <div class="brand">FLAPPY <span>ADMIN</span></div>
+
+    <div class="nav-label">MAIN MENU</div>
+
+    <nav class="nav">
+      <button class="active" onclick="showScreen('dashboard',this)">
+        ◫ <span>Dashboard</span>
+      </button>
+
+      <button onclick="showScreen('players',this)">
+        ◉ <span>Players</span>
+      </button>
+
+      <button onclick="showScreen('bans',this)">
+        ⛔ <span>Bans</span>
+      </button>
+
+      <button onclick="showScreen('settings',this)">
+        ⚙ <span>Settings</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="status">
+        <span class="dot"></span>
+        Connected to Supabase
+      </div>
+
+      <button class="logout" onclick="logoutAdmin()">
+        Log out
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <p>Flappy Arcade administration</p>
+      </div>
+
+      <div class="admin-tag">ADMIN SESSION</div>
+    </header>
+
+    <!-- DASHBOARD -->
+    <section class="screen active" id="dashboard">
+
+      <div class="stats">
+        <div class="stat">
+          <p>ONLINE PLAYERS</p>
+          <h2 class="blue" id="onlineCount">0</h2>
+        </div>
+
+        <div class="stat">
+          <p>ACTIVE BANS</p>
+          <h2 class="red" id="banCount">0</h2>
+        </div>
+
+        <div class="stat">
+          <p>CONNECTION</p>
+          <h2 class="green" style="font-size:20px">ONLINE</h2>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>Live activity</h2>
+          <span class="muted">Live presence</span>
+        </div>
+
+        <div id="dashboardActivity" class="empty">
+          Waiting for player activity...
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>System status</h2>
+        </div>
+
+        <table class="table">
+          <tr>
+            <td>Supabase Edge Function</td>
+            <td><span class="badge online">Connected</span></td>
+          </tr>
+          <tr>
+            <td>Admin authentication</td>
+            <td><span class="badge online">Verified</span></td>
+          </tr>
+          <tr>
+            <td>Live player presence</td>
+            <td><span class="badge online">Listening</span></td>
+          </tr>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- PLAYERS -->
+    <section class="screen" id="players">
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>Live players</h2>
+          <span class="muted" id="playerRefresh">Updating...</span>
+        </div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>PLAYER</th>
+              <th>STATUS</th>
+            </tr>
+          </thead>
+          <tbody id="playersTable">
+            <tr><td colspan="2" class="empty">
+              Waiting for players...
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- BANS -->
+    <section class="screen" id="bans">
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>Ban a player</h2>
+          <span class="muted">Temporary ban</span>
+        </div>
+
+        <div class="form-grid">
+          <input id="banPlayerId"
+            placeholder="Player ID">
+
+          <input id="banPlayerName"
+            placeholder="Player name">
+
+          <select id="banDuration">
+            <option value="10">10 minutes</option>
+            <option value="60">1 hour</option>
+            <option value="1440">24 hours</option>
+            <option value="10080">7 days</option>
+            <option value="43200">30 days</option>
+            <option value="525600">1 year</option>
+          </select>
+
+          <input id="banReason"
+            placeholder="Reason for ban">
+
+          <button class="primary full" onclick="banPlayer()">
+            BAN PLAYER
+          </button>
+        </div>
+
+        <div class="message" id="banMessage"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>Active bans</h2>
+          <button class="action" onclick="loadBans()">Refresh</button>
+        </div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>PLAYER</th>
+              <th>EXPIRES</th>
+              <th>ACTION</th>
+            </tr>
+          </thead>
+
+          <tbody id="bansTable">
+            <tr><td colspan="3" class="empty">Loading bans...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="screen" id="settings">
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>Admin settings</h2>
+        </div>
+
+        <div class="settings-info">
+          <p><strong>Application:</strong> Flappy Arcade</p>
+          <p><strong>Backend:</strong> Supabase Edge Functions</p>
+          <p><strong>Admin endpoint:</strong> admin-boas</p>
+          <p><strong>Session:</strong> Authenticated</p>
+          <p><strong>Security:</strong> Admin code is kept in memory only.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>Session</h2>
+        </div>
+
+        <p class="muted" style="margin-bottom:15px">
+          Logging out clears the admin code from this page.
+        </p>
+
+        <button class="primary" onclick="logoutAdmin()">
+          LOG OUT
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<script type="module">
+import { createClient } from
+  "https://esm.sh/@supabase/supabase-js@2";
+
+const SUPABASE_URL =
+  "https://ilgdnvtdmzjrclybbexi.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_6kZmesu_W4jgVmDKDw6v8Q_Y5SlesV0";
+
+const FUNCTION_URL =
+  SUPABASE_URL + "/functions/v1/admin-boas";
+
+const supabase = createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let adminCode = "";
+let presenceChannel = null;
+let activePlayers = [];
+
+async function callAdmin(action, extra = {}) {
+  const response = await fetch(FUNCTION_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_KEY
+    },
+    body: JSON.stringify({
+      action,
+      adminCode,
+      ...extra
+    })
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.error || "Request failed.");
+  }
+
+  return result;
+}
+
+window.loginAdmin = async function() {
+  const code = document.getElementById("adminCode").value;
+  const errorBox = document.getElementById("loginError");
+
+  errorBox.textContent = "";
+
+  if (!code) {
+    errorBox.textContent = "Enter your admin code.";
+    return;
+  }
+
+  adminCode = code;
+
+  try {
+    await callAdmin("verify");
+
+    document.getElementById("login").style.display = "none";
+    document.getElementById("app").style.display = "block";
+
+    await loadBans();
+    connectPresence();
+
+  } catch (error) {
+    adminCode = "";
+    errorBox.textContent = error.message;
+  }
+};
+
+window.logoutAdmin = function() {
+  adminCode = "";
+
+  if (presenceChannel) {
+    supabase.removeChannel(presenceChannel);
+    presenceChannel = null;
+  }
+
+  document.getElementById("app").style.display = "none";
+  document.getElementById("login").style.display = "flex";
+  document.getElementById("adminCode").value = "";
+  document.getElementById("loginError").textContent = "";
+};
+
+window.showScreen = function(screen, button) {
+  document.querySelectorAll(".screen").forEach(el => {
+    el.classList.remove("active");
+  });
+
+  document.querySelectorAll(".nav button").forEach(el => {
+    el.classList.remove("active");
+  });
+
+  document.getElementById(screen).classList.add("active");
+  button.classList.add("active");
+
+  const titles = {
+    dashboard: "Dashboard",
+    players: "Players",
+    bans: "Bans",
+    settings: "Settings"
+  };
+
+  document.getElementById("pageTitle").textContent =
+    titles[screen];
+
+  if (screen === "bans") loadBans();
+};
+
+function connectPresence() {
+  if (presenceChannel) {
+    supabase.removeChannel(presenceChannel);
+  }
+
+  presenceChannel = supabase.channel("flappy-live", {
+    config: {
+      presence: {
+        key: "admin-panel"
+      }
+    }
+  });
+
+  presenceChannel
+    .on("presence", { event: "sync" }, () => {
+      const state = presenceChannel.presenceState();
+
+      activePlayers = [];
+
+      for (const [key, entries] of Object.entries(state)) {
+        for (const entry of entries) {
+          if (key === "admin-panel") continue;
+
+          activePlayers.push({
+            key,
+            ...entry
+          });
+        }
+      }
+
+      renderPlayers();
+    })
+    .subscribe();
+}
+
+function renderPlayers() {
+  const table = document.getElementById("playersTable");
+  const count = document.getElementById("onlineCount");
+
+  count.textContent = activePlayers.length;
+
+  if (activePlayers.length === 0) {
+    table.innerHTML =
+      '<tr><td colspan="2" class="empty">No players currently online.</td></tr>';
+
+    document.getElementById("dashboardActivity").textContent =
+      "No players currently online.";
+
+    document.getElementById("playerRefresh").textContent =
+      "0 players online";
+
+    return;
+  }
+
+  table.innerHTML = "";
+
+  activePlayers.slice(0, 8).forEach(player => {
+    const name = player.name || player.playerName || player.key;
+
+    const row = document.createElement("tr");
+
+    const nameCell = document.createElement("td");
+    nameCell.textContent = String(name);
+
+    const statusCell = document.createElement("td");
+    statusCell.innerHTML =
+      '<span class="badge online">ONLINE</span>';
+
+    row.append(nameCell, statusCell);
+    table.appendChild(row);
+  });
+
+  document.getElementById("dashboardActivity").textContent =
+    activePlayers.length + " player(s) currently online.";
+
+  document.getElementById("playerRefresh").textContent =
+    activePlayers.length + " players online";
+}
+
+window.loadBans = async function() {
+  const table = document.getElementById("bansTable");
+
+  try {
+    const result = await callAdmin("list-bans");
+    const bans = result.bans || [];
+
+    document.getElementById("banCount").textContent = bans.length;
+
+    if (bans.length === 0) {
+      table.innerHTML =
+        '<tr><td colspan="3" class="empty">No active bans.</td></tr>';
+      return;
+    }
+
+    table.innerHTML = "";
+
+    bans.slice(0, 5).forEach(ban => {
+      const row = document.createElement("tr");
+
+      const nameCell = document.createElement("td");
+      nameCell.textContent = ban.player_name || ban.player_id;
+
+      const expiryCell = document.createElement("td");
+      expiryCell.textContent =
+        new Date(ban.expires_at).toLocaleString();
+
+      const actionCell = document.createElement("td");
+
+      const button = document.createElement("button");
+      button.className = "action danger";
+      button.textContent = "Unban";
+
+      button.addEventListener("click", () => {
+        unbanPlayer(ban.player_id);
+      });
+
+      actionCell.appendChild(button);
+      row.append(nameCell, expiryCell, actionCell);
+
+      table.appendChild(row);
+    });
+
+  } catch (error) {
+    table.innerHTML =
+      '<tr><td colspan="3" class="empty"></td></tr>';
+
+    table.querySelector(".empty").textContent = error.message;
+  }
+};
+
+window.banPlayer = async function() {
+  const message = document.getElementById("banMessage");
+
+  const playerId =
+    document.getElementById("banPlayerId").value.trim();
+
+  const playerName =
+    document.getElementById("banPlayerName").value.trim();
+
+  const durationMinutes =
+    Number(document.getElementById("banDuration").value);
+
+  const reason =
+    document.getElementById("banReason").value.trim();
+
+  if (!playerId) {
+    message.textContent = "Enter a player ID.";
+    return;
+  }
+
+  try {
+    await callAdmin("ban-player", {
+      playerId,
+      playerName,
+      durationMinutes,
+      reason
+    });
+
+    message.textContent = "Player successfully banned.";
+
+    document.getElementById("banPlayerId").value = "";
+    document.getElementById("banPlayerName").value = "";
+    document.getElementById("banReason").value = "";
+
+    await loadBans();
+
+  } catch (error) {
+    message.textContent = error.message;
+  }
+};
+
+window.unbanPlayer = async function(playerId) {
+  if (!confirm("Are you sure you want to unban this player?")) {
+    return;
+  }
+
+  try {
+    await callAdmin("unban-player", { playerId });
+    await loadBans();
+  } catch (error) {
+    alert(error.message);
+  }
+};
+</script>
+
+</body>
+</html>
