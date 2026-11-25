@@ -1,822 +1,1480 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Flappy Arcade</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#101827;color:white;font-family:Arial,sans-serif;text-align:center}
-h1{margin:18px 0;color:#70d6ff}
-h3{margin-bottom:10px}
-#game{display:block;width:min(94vw,400px);height:auto;margin:15px auto;background:#8ed8ff;border:4px solid #fff;border-radius:14px;touch-action:manipulation}
-.panel{background:#1c293b;padding:16px;margin:12px auto;border-radius:12px;width:min(94%,430px)}
-input,button,select{padding:11px;border:0;border-radius:8px;margin:4px;font-size:15px}
-input{width:190px}
-button{background:#70d6ff;color:#101827;font-weight:bold;cursor:pointer}
-button:hover{filter:brightness(1.1)}
-button:disabled{opacity:.45;cursor:not-allowed}
-.mode-button{min-width:130px}
-.mode-button.selected{background:#8ac926;outline:3px solid white}
-#status{color:#a9e7ff;min-height:22px}
-#admin{display:none}
-#players{text-align:left;max-height:180px;overflow:auto}
-.player{padding:8px;margin:4px;background:#293b52;border-radius:7px;cursor:pointer}
-.player.selected{outline:2px solid #70d6ff}
-.small{font-size:12px;color:#b7c5d8}
-#leaderboard p{margin:8px}
-#modeStatus{color:#a9e7ff;min-height:20px}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: monospace;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: #020617;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+#wrap {
+  position: relative;
+  width: min(400px, calc(100vw - 20px), calc((100svh - 20px) * 5 / 7));
+  aspect-ratio: 5 / 7;
+  border: 3px solid #38bdf8;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #0f172a;
+  touch-action: none;
+}
+
+button {
+  padding: 12px 22px;
+  font-weight: bold;
+  font-size: 15px;
+  background: #22c55e;
+  color: #050816;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-appearance: none;
+  appearance: none;
+  user-select: none;
+}
+
+button:disabled {
+  opacity: .6;
+}
+
+input {
+  padding: 10px;
+  text-align: center;
+  text-transform: uppercase;
+  background: #1e293b;
+  color: white;
+  border: 2px solid #38bdf8;
+  border-radius: 6px;
+  font-size: 16px;
+  width: min(220px, 85%);
+}
+
+#ui {
+  position: absolute;
+  inset: 0;
+  background: rgba(15,23,42,.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px;
+  text-align: center;
+  z-index: 5;
+}
+
+.hidden {
+  display: none !important;
+}
+
+ul {
+  list-style: none;
+  width: min(270px, 95%);
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px;
+  border-bottom: 1px solid #334155;
+  font-size: 13px;
+}
+
+.gold {
+  color: #facc15;
+  font-weight: bold;
+}
+
+#status {
+  color: #94a3b8;
+  font-size: 11px;
+  max-width: 300px;
+  overflow-wrap: anywhere;
+}
+
+#intro {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  overflow: hidden;
+  text-align: center;
+  background: radial-gradient(circle at 50% 45%, #172554 0%, #080d25 58%, #020617 100%);
+}
+
+#intro::before,
+#intro::after {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border: 2px solid rgba(56,189,248,.22);
+  border-radius: 50%;
+  animation: intro-ring 4s linear infinite;
+  pointer-events: none;
+}
+
+#intro::after {
+  width: 360px;
+  height: 360px;
+  animation-delay: -2s;
+}
+
+#introLogo {
+  z-index: 1;
+  color: #facc15;
+  font-size: clamp(25px, 8vw, 38px);
+  text-shadow: 0 0 10px #facc15, 0 0 28px #38bdf8;
+  animation: logo-float 1.2s ease-in-out infinite alternate;
+}
+
+#introBird {
+  z-index: 1;
+  font-size: 48px;
+  animation: bird-bob .55s ease-in-out infinite alternate;
+}
+
+#introTag {
+  z-index: 1;
+  color: #7dd3fc;
+  font-size: 12px;
+  letter-spacing: 3px;
+}
+
+#introStart {
+  z-index: 2;
+  margin-top: 12px;
+  background: #38bdf8;
+  color: #020617;
+  box-shadow: 0 0 18px rgba(56,189,248,.55);
+  animation: button-pulse 1s ease-in-out infinite alternate;
+}
+
+#introCountdown {
+  z-index: 1;
+  color: #facc15;
+  font-size: 14px;
+  min-height: 18px;
+}
+
+#musicToggle {
+  position: absolute;
+  z-index: 30;
+  top: 8px;
+  right: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  background: #1e293b;
+  color: white;
+  border: 1px solid #38bdf8;
+}
+
+@keyframes intro-ring {
+  from { transform: scale(.65); opacity: .75; }
+  to { transform: scale(1.25); opacity: .05; }
+}
+
+@keyframes logo-float {
+  from { transform: translateY(-5px) scale(.98); }
+  to { transform: translateY(5px) scale(1.04); }
+}
+
+@keyframes bird-bob {
+  from { transform: translateY(-9px) rotate(-8deg); }
+  to { transform: translateY(9px) rotate(8deg); }
+}
+
+@keyframes button-pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+
+#adminPanel {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: #020617;
+  padding: 14px;
+  overflow-y: auto;
+  text-align: center;
+}
+
+#adminPanel h2 {
+  color: #38bdf8;
+  margin: 12px 0;
+}
+
+#adminPanel input,
+#adminPanel select {
+  margin: 5px;
+  width: 90%;
+  padding: 10px;
+  text-align: center;
+  background: #1e293b;
+  color: white;
+  border: 2px solid #38bdf8;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.admin-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.admin-actions button {
+  padding: 9px 12px;
+  font-size: 12px;
+}
+
+.admin-row {
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 8px;
+  margin: 7px 0;
+  overflow-wrap: anywhere;
+}
+
+.admin-row button {
+  margin: 5px 3px 0;
+  padding: 7px 10px;
+  font-size: 11px;
+}
+
+#adminStatus {
+  font-size: 12px;
+  color: #facc15;
+  margin: 10px;
+  overflow-wrap: anywhere;
+}
+
+.danger {
+  background: #ef4444;
+  color: white;
+}
+
+.blue {
+  background: #38bdf8;
+}
 </style>
 </head>
+
 <body>
 
-<h1>🐤 Flappy Arcade</h1>
+<div id="wrap">
 
-<div class="panel" id="menu">
-  <h2>Choose your game mode</h2>
-  <button class="mode-button" id="trainingBtn">TRAINING</button>
-  <button class="mode-button" id="multiplayerBtn">MULTIPLAYER</button>
-  <p id="modeStatus">Select a game mode to continue.</p>
+  <canvas id="c" width="400" height="560"></canvas>
 
-  <input id="playerName" maxlength="10" placeholder="Your name">
-  <br>
-  <button id="playBtn" disabled>PLAY</button>
+  <button id="musicToggle" type="button">MUZIEK: AAN</button>
 
-  <p id="status">Connecting...</p>
+  <div id="intro">
+    <h1 id="introLogo">FLAPPY ARCADE</h1>
+    <div id="introBird">🐤</div>
+    <p id="introTag">GET READY TO FLY</p>
+    <p id="introCountdown">START DE INTRO</p>
+    <button id="introStart" type="button">START INTRO</button>
+  </div>
 
-  <h3>🏆 Online Top 5</h3>
-  <div id="leaderboard">Loading leaderboard...</div>
+  <audio id="startupMusic" src="flappy_arcade_theme.wav" preload="auto"></audio>
+
+  <div id="ui" class="hidden">
+    <h1 id="t" style="color:#facc15">FLAPPY ARCADE</h1>
+
+    <p style="color:#94a3b8;font-size:13px">
+      Tik, klik of spatiebalk om te vliegen
+    </p>
+
+    <p id="fs" class="hidden" style="font-size:17px"></p>
+
+    <input id="n" maxlength="10" placeholder="JOUW NAAM">
+
+    <h3 style="color:#38bdf8">ONLINE TOP 5 RANGLIJST</h3>
+
+    <ul id="lb"></ul>
+
+    <p id="status">Online ranglijst laden...</p>
+
+    <button id="btn" type="button">SPEEL NU</button>
+  </div>
+
+  <div id="adminPanel" class="hidden">
+    <h2>FLAPPY ARCADE ADMIN</h2>
+    <p style="color:#94a3b8;font-size:11px">Openen met Ctrl + Alt + E · Sluiten met Escape</p>
+
+    <section id="adminLogin">
+      <p>Voer je admincode in</p>
+      <input id="adminCodeInput" type="password" placeholder="ADMINCODE" autocomplete="off">
+
+      <div class="admin-actions">
+        <button id="adminLoginButton" type="button">INLOGGEN</button>
+        <button id="adminCloseLogin" class="danger" type="button">SLUITEN</button>
+      </div>
+    </section>
+
+    <section id="adminContent" class="hidden">
+      <h3 style="color:#facc15">SCORE TOEVOEGEN</h3>
+
+      <input id="newName" maxlength="10" placeholder="NAAM">
+      <input id="newScore" type="number" min="0" max="999999" placeholder="SCORE">
+
+      <div class="admin-actions">
+        <button id="addScoreButton" type="button">SCORE TOEVOEGEN</button>
+        <button id="refreshScoresButton" class="blue" type="button">VERNIEUWEN</button>
+        <button id="adminLogoutButton" class="danger" type="button">UITLOGGEN</button>
+      </div>
+
+      <h3 style="color:#38bdf8">BESTAANDE SCORES</h3>
+      <div id="adminScores"></div>
+
+      <hr style="border:1px solid #334155;margin:18px 0">
+
+      <h3 style="color:#ef4444">SPELER OP NAAM BANNEN</h3>
+      <input id="banName" maxlength="10" placeholder="SPELERSNAAM">
+
+      <select id="banDuration">
+        <option value="10">10 minuten</option>
+        <option value="60">1 uur</option>
+        <option value="1440">24 uur</option>
+        <option value="10080">7 dagen</option>
+        <option value="43200">30 dagen</option>
+        <option value="custom">Aangepaste duur</option>
+        <option value="permanent">Permanent</option>
+      </select>
+
+      <div id="customBanFields" class="hidden">
+        <input id="customBanAmount" type="number" min="1" max="365" placeholder="Aantal">
+        <select id="customBanUnit">
+          <option value="minutes">Minuten</option>
+          <option value="hours">Uren</option>
+          <option value="days">Dagen</option>
+        </select>
+      </div>
+
+      <input id="banReason" maxlength="120" placeholder="Reden (optioneel)">
+
+      <div class="admin-actions">
+        <button id="banNameButton" class="danger" type="button">NAAM BANNEN</button>
+        <button id="refreshBansButton" class="blue" type="button">BANLIJST VERVERSEN</button>
+      </div>
+
+      <h3 style="color:#ef4444">ACTIEVE BANS</h3>
+      <div id="adminBans"></div>
+    </section>
+
+    <p id="adminStatus"></p>
+  </div>
+
 </div>
 
-<canvas id="game" width="400" height="560"></canvas>
-
-<div class="panel">
-  <button id="restartBtn">BACK TO MENU</button>
-  <button id="soundBtn">Sound: Off</button>
-  <p class="small">Tap or press SPACE to flap.</p>
-</div>
-
-<div class="panel" id="admin">
-  <h2>Admin Panel</h2>
-  <p id="adminStatus">Admin active</p>
-
-  <h3>Active players</h3>
-  <div id="players">No players online</div>
-  <div id="selectedInfo">Select a player.</div>
-
-  <h3>Temporarily ban player</h3>
-  <select id="banDuration">
-    <option value="5">5 minutes</option>
-    <option value="60">1 hour</option>
-    <option value="1440">24 hours</option>
-    <option value="10080">7 days</option>
-    <option value="43200">30 days</option>
-    <option value="custom">Custom</option>
-  </select>
-
-  <input id="customMinutes" type="number" min="1" max="525600" placeholder="Minutes">
-  <input id="banReason" maxlength="120" placeholder="Reason (optional)">
-  <br>
-
-  <button id="banBtn">Ban player</button>
-  <button id="unbanBtn">Remove ban</button>
-  <button id="refreshBans">Refresh bans</button>
-
-  <div id="banList"></div>
-  <button id="adminLogout">Log out</button>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+"use strict";
+
+// SUPABASE
+
 const SUPABASE_URL = "https://ilgdnvtdmzjrclybbexi.supabase.co";
 const SUPABASE_KEY = "sb_publishable_6kZmesu_W4jgVmDKDw6v8Q_Y5SlesV0";
-const FUNCTION_URL = SUPABASE_URL + "/functions/v1/admin-boas";
 
-const db = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+let db = null;
 
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-const statusEl = document.getElementById("status");
+try {
+  if (window.supabase) {
+    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+} catch (error) {
+  console.error("Supabase fout:", error);
+}
 
-const colors = [
-  "#ff595e","#ffca3a","#8ac926","#1982c4",
-  "#c77dff","#ff924c","#00f5d4","#f15bb5","#ffffff"
-];
+// ELEMENTEN
 
-const playerId = (() => {
-  let id = localStorage.getItem("flappy_player_id");
+const c = document.getElementById("c");
+const ctx = c.getContext("2d");
 
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem("flappy_player_id", id);
+const ui = document.getElementById("ui");
+const t = document.getElementById("t");
+const fs = document.getElementById("fs");
+const n = document.getElementById("n");
+const lb = document.getElementById("lb");
+const btn = document.getElementById("btn");
+const status = document.getElementById("status");
+
+const intro = document.getElementById("intro");
+const introStart = document.getElementById("introStart");
+const introCountdown = document.getElementById("introCountdown");
+const startupMusic = document.getElementById("startupMusic");
+const musicToggle = document.getElementById("musicToggle");
+
+const adminPanel = document.getElementById("adminPanel");
+const adminLogin = document.getElementById("adminLogin");
+const adminContent = document.getElementById("adminContent");
+const adminCodeInput = document.getElementById("adminCodeInput");
+const adminStatus = document.getElementById("adminStatus");
+const adminScores = document.getElementById("adminScores");
+const adminBans = document.getElementById("adminBans");
+
+let adminCode = "";
+let adminLoggedIn = false;
+
+// VEILIG OPSLAAN
+
+function safeGet(key) {
+  try {
+    return localStorage.getItem(key) || "";
+  } catch {
+    return "";
+  }
+}
+
+function safeSet(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch (error) {
+    console.warn("Opslaan niet mogelijk:", error);
+  }
+}
+
+n.value = safeGet("flappy_name");
+
+let playerId = safeGet("flappy_player_id");
+if (!playerId) {
+  playerId = (crypto.randomUUID
+    ? crypto.randomUUID()
+    : "player-" + Date.now() + "-" + Math.random().toString(36).slice(2));
+  safeSet("flappy_player_id", playerId);
+}
+
+// MUZIEK
+
+let musicEnabled = true;
+
+function updateMusicButton() {
+  musicToggle.textContent = musicEnabled ? "MUZIEK: AAN" : "MUZIEK: UIT";
+}
+
+async function toggleMusic() {
+  musicEnabled = !musicEnabled;
+  updateMusicButton();
+
+  if (!musicEnabled) {
+    startupMusic.pause();
+    return;
   }
 
-  return id;
-})();
+  try {
+    startupMusic.volume = 0.85;
+    await startupMusic.play();
+  } catch (error) {
+    console.log("Muziek kan niet automatisch starten:", error);
+  }
+}
 
-const playerColor =
-  localStorage.getItem("flappy_player_color") ||
-  colors[Math.floor(Math.random() * colors.length)];
+musicToggle.addEventListener("click", toggleMusic);
 
-localStorage.setItem("flappy_player_color", playerColor);
+// INTRO
 
-let playerName = "";
-let selectedMode = null;
+let introRunning = false;
 
-let channel = null;
-let remotePlayers = [];
-let selectedPlayer = null;
+function beginIntro() {
+  if (introRunning) return;
 
-let adminCode = null;
-let isAdmin = false;
+  introRunning = true;
+  introStart.disabled = true;
+  introStart.textContent = "START...";
+  introCountdown.textContent = "5";
 
-let gameRunning = false;
-let gameOver = false;
+  if (musicEnabled) {
+    startupMusic.currentTime = 0;
+    startupMusic.volume = 0.85;
 
-let score = 0;
+    startupMusic.play().catch(error => {
+      console.log("Muziek niet beschikbaar:", error);
+    });
+  }
+
+  const startedAt = Date.now();
+
+  const countdownTimer = setInterval(() => {
+    const elapsed = (Date.now() - startedAt) / 1000;
+    const remaining = Math.max(0, 5 - Math.floor(elapsed));
+
+    introCountdown.textContent =
+      remaining > 0 ? String(remaining) : "LET'S FLY!";
+
+    if (elapsed >= 4.4 && musicEnabled) {
+      startupMusic.volume = Math.max(0, 0.85 * (5 - elapsed) / 0.6);
+    }
+  }, 50);
+
+  setTimeout(() => {
+    clearInterval(countdownTimer);
+
+    startupMusic.pause();
+    startupMusic.currentTime = 0;
+    startupMusic.volume = 0.85;
+
+    intro.classList.add("hidden");
+    ui.classList.remove("hidden");
+  }, 5000);
+}
+
+introStart.addEventListener("click", beginIntro);
+
+// SPELVARIABELEN
+
+let bird;
 let pipes = [];
-let lastPipe = 0;
+let score = 0;
+let over = true;
+let fc = 0;
+let animId = 0;
+let playerName = "SPELER";
+let gameRunning = false;
+let startingGame = false;
+let currentRunId = null;
 
-let soundOn = false;
-let audioContext = null;
+let lives = 3;
+let invulnerable = false;
+let invulnerableTimer = 0;
+let respawning = false;
+let respawnTimer = 0;
+let scoreSaved = false;
 
-let runId = null;
+// STATUS
 
-let bird = {x:85,y:260,vy:0};
+function setStatus(message) {
+  status.textContent = message;
+}
 
-const gravity = 0.42;
-const jump = -7.4;
+// RANGLIJST
 
+function showLB(list, currentName = "", currentScore = -1) {
+  lb.innerHTML = "";
 
-/* SERVER */
+  if (!list || list.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "Nog geen scores";
+    lb.appendChild(li);
+    return;
+  }
 
-async function callFunction(action, extra = {}) {
-  const response = await fetch(FUNCTION_URL, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({action, ...extra})
+  list.forEach((item, index) => {
+    const li = document.createElement("li");
+
+    if (
+      index === 0 ||
+      (item.name === currentName && item.score === currentScore)
+    ) {
+      li.className = "gold";
+    }
+
+    const left = document.createElement("span");
+    left.textContent = (index + 1) + ". " + item.name;
+
+    const right = document.createElement("span");
+    right.textContent = item.score;
+
+    li.appendChild(left);
+    li.appendChild(right);
+    lb.appendChild(li);
+  });
+}
+
+// SCORES LADEN
+
+async function loadLeaderboard(currentName = "", currentScore = -1) {
+  if (!db) {
+    setStatus("Supabase niet beschikbaar.");
+    showLB([]);
+    return;
+  }
+
+  try {
+    const { data, error } = await db
+      .from("flappy_scores")
+      .select("name, score")
+      .order("score", { ascending: false })
+      .order("created_at", { ascending: true })
+      .limit(5);
+
+    if (error) throw error;
+
+    showLB(data, currentName, currentScore);
+    setStatus("ONLINE - Scores gedeeld met iedereen");
+
+  } catch (error) {
+    console.error("Leaderboard laden mislukt:", error);
+    setStatus("Fout bij laden: " + error.message);
+  }
+}
+
+// VERZOEKEN NAAR DE SPELFUNCTIE
+
+async function gameRequest(action, extra = {}) {
+  if (!db) throw new Error("Supabase niet beschikbaar.");
+
+  const { data, error } = await db.functions.invoke("admin-boas", {
+    body: { action, ...extra }
   });
 
-  const data = await response.json().catch(() => ({}));
+  if (error) {
+    let message = error.message || "Verzoek mislukt.";
 
-  if (!response.ok) {
-    throw new Error(data.error || "Server error");
+    try {
+      if (error.context && typeof error.context.clone === "function") {
+        const responseBody = await error.context.clone().json();
+        if (responseBody && responseBody.error) {
+          message = responseBody.error;
+        }
+      }
+    } catch (_) {}
+
+    throw new Error(message);
+  }
+
+  if (data && data.error) {
+    throw new Error(data.error);
   }
 
   return data;
 }
 
-function setStatus(message) {
-  statusEl.textContent = message;
-}
+// SCORE OPSLAAN VIA DE ANTI-CHEAT- EN BANCONTROLE
 
-
-/* GAME MODE */
-
-function selectMode(mode) {
-  if (gameRunning) return;
-
-  selectedMode = mode;
-
-  document.getElementById("trainingBtn")
-    .classList.toggle("selected", mode === "training");
-
-  document.getElementById("multiplayerBtn")
-    .classList.toggle("selected", mode === "multiplayer");
-
-  document.getElementById("playBtn").disabled = false;
-
-  if (mode === "training") {
-    document.getElementById("modeStatus").textContent =
-      "Training mode: your score will not be uploaded.";
-  } else {
-    document.getElementById("modeStatus").textContent =
-      "Multiplayer mode: your score will be saved online.";
-  }
-
-  setStatus("Ready to play.");
-}
-
-
-/* BAN CHECK */
-
-async function checkBan() {
-  const result = await callFunction("check-ban", {playerId});
-
-  if (result.banned) {
-    setStatus(
-      "You are temporarily banned until " +
-      new Date(result.expiresAt).toLocaleString("en-GB")
-    );
-
-    document.getElementById("playBtn").disabled = true;
-    return true;
-  }
-
-  document.getElementById("playBtn").disabled = !selectedMode;
-  return false;
-}
-
-
-/* MULTIPLAYER PRESENCE */
-
-async function connectMultiplayer() {
-  channel = db.channel("flappy-live", {
-    config: {presence: {key: playerId}}
-  });
-
-  channel.on("presence", {event:"sync"}, () => {
-    const state = channel.presenceState();
-    remotePlayers = [];
-
-    for (const key of Object.keys(state)) {
-      for (const item of state[key]) {
-        if (item.playerId !== playerId && item.playing) {
-          remotePlayers.push(item);
-        }
-      }
-    }
-
-    renderPlayerList();
-  });
-
-  channel.subscribe(async state => {
-    if (state === "SUBSCRIBED") {
-      setStatus("Connected to multiplayer.");
-      await publishPresence();
-    }
-  });
-}
-
-async function publishPresence() {
-  if (!channel) return;
-
-  await channel.track({
-    playerId,
-    name: playerName || "Player",
-    color: playerColor,
-    x: bird.x,
-    y: bird.y,
-    score,
-    playing: gameRunning && selectedMode === "multiplayer",
-    updatedAt: Date.now()
-  });
-}
-
-async function updatePresence() {
-  if (!channel || selectedMode !== "multiplayer") return;
-
-  await channel.track({
-    playerId,
-    name: playerName || "Player",
-    color: playerColor,
-    x: bird.x,
-    y: bird.y,
-    score,
-    playing: gameRunning,
-    updatedAt: Date.now()
-  });
-}
-
-
-/* ADMIN PLAYER LIST */
-
-function renderPlayerList() {
-  if (!isAdmin) return;
-
-  const container = document.getElementById("players");
-  container.innerHTML = "";
-
-  if (!remotePlayers.length) {
-    container.textContent = "No other active players.";
+async function saveScore(name, newScore) {
+  if (!db || !currentRunId) {
+    setStatus("Score niet opgeslagen: speel opnieuw.");
     return;
   }
 
-  remotePlayers.forEach(p => {
-    const item = document.createElement("div");
+  try {
+    const result = await gameRequest("finish-run", {
+      runId: currentRunId,
+      playerId,
+      name,
+      score: newScore
+    });
 
-    item.className = "player" +
-      (selectedPlayer?.playerId === p.playerId ? " selected" : "");
+    currentRunId = null;
 
-    item.textContent = p.name + " – Score: " + p.score;
-    item.style.borderLeft = "7px solid " + (p.color || "#ffffff");
+    if (!result || !result.success) {
+      throw new Error(result?.error || "Score kon niet worden opgeslagen.");
+    }
 
-    item.onclick = () => {
-      selectedPlayer = p;
+    setStatus("Score online opgeslagen!");
+    await loadLeaderboard(name, newScore);
 
-      document.getElementById("selectedInfo").textContent =
-        "Selected: " + p.name +
-        " | ID: " + p.playerId +
-        " | Score: " + p.score;
+  } catch (error) {
+    console.error("Score opslaan mislukt:", error);
+    currentRunId = null;
+    setStatus("Score niet opgeslagen: " + error.message);
+  }
+}
 
-      renderPlayerList();
+// LEVENS WEERGEVEN
+
+function drawLives() {
+  ctx.save();
+  ctx.font = "bold 22px monospace";
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#ef4444";
+
+  let hearts = "";
+
+  for (let i = 0; i < 3; i++) {
+    hearts += i < lives ? "♥ " : "♡ ";
+  }
+
+  ctx.fillText(hearts, 12, 38);
+  ctx.restore();
+}
+
+// SPEL STARTEN
+
+async function start() {
+  if (gameRunning || startingGame) return;
+
+  startingGame = true;
+
+  try {
+    playerName = (n.value.trim() || "SPELER")
+      .replace(/[^a-zA-Z0-9_-]/g, "")
+      .slice(0, 10)
+      .toUpperCase() || "SPELER";
+
+    n.value = playerName;
+    safeSet("flappy_name", playerName);
+
+    setStatus("Spel controleren...");
+
+    // Iedere spelronde krijgt een unieke server-run.
+    const runResult = await gameRequest("start-run", {
+      playerId,
+      playerName
+    });
+
+    if (!runResult || !runResult.runId) {
+      throw new Error("De server kon geen spelronde starten.");
+    }
+
+    currentRunId = runResult.runId;
+    gameRunning = true;
+
+    bird = {
+      x: 90,
+      y: 250,
+      r: 14,
+      v: 0,
+      g: 0.42,
+      j: -7.4
     };
 
-    container.appendChild(item);
-  });
+    pipes = [];
+    score = 0;
+    fc = 0;
+    over = false;
+
+    lives = 3;
+    invulnerable = false;
+    invulnerableTimer = 0;
+    respawning = false;
+    respawnTimer = 0;
+    scoreSaved = false;
+
+    t.textContent = "FLAPPY ARCADE";
+    t.style.color = "#facc15";
+
+    fs.classList.add("hidden");
+    btn.textContent = "SPEEL NU";
+
+    ui.classList.add("hidden");
+
+    setStatus("Veel plezier met spelen!");
+    cancelAnimationFrame(animId);
+    loop();
+
+  } catch (error) {
+    gameRunning = false;
+    currentRunId = null;
+    console.error("Spel starten mislukt:", error);
+    ui.classList.remove("hidden");
+    setStatus(error.message || "Spel starten mislukt.");
+  } finally {
+    startingGame = false;
+  }
 }
 
+// SPEELKNOP
 
-/* START GAME */
+let lastStartInput = 0;
 
-async function startGame() {
-  if (gameRunning) return;
+function startFromButton(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
 
-  if (!selectedMode) {
-    setStatus("Please choose Training or Multiplayer first.");
+  const now = Date.now();
+
+  if (now - lastStartInput < 700) return;
+
+  lastStartInput = now;
+  start();
+}
+
+btn.addEventListener("pointerup", startFromButton);
+btn.addEventListener("click", startFromButton);
+
+// VOGEL LATEN VLIEGEN
+
+function flap(event) {
+  if (event) event.preventDefault();
+
+  if (!over && bird && !respawning) {
+    bird.v = bird.j;
+  }
+}
+
+// LEVEN VERLIEZEN
+
+function loseLife() {
+  if (over || invulnerable || respawning) return;
+
+  lives--;
+
+  if (lives <= 0) {
+    lives = 0;
+    die();
     return;
   }
 
-  try {
-    if (await checkBan()) return;
-  } catch (error) {
-    setStatus("Could not check ban status: " + error.message);
-    return;
+  // Vogel opnieuw positioneren
+  bird.y = 250;
+  bird.v = 0;
+
+  // Korte bescherming na respawn
+  invulnerable = true;
+  invulnerableTimer = 100;
+  respawning = true;
+  respawnTimer = 35;
+
+  // Obstakels rond de speler verwijderen
+  pipes = pipes.filter(p => p.x > bird.x + 100);
+
+  console.log("Leven verloren. Over:", lives);
+}
+
+// GAME OVER
+
+function die() {
+  if (over) return;
+
+  over = true;
+  gameRunning = false;
+
+  t.textContent = "GAME OVER";
+  t.style.color = "#ef4444";
+
+  fs.textContent =
+    playerName + " - Score: " + score + " - Levens: " + lives;
+
+  fs.classList.remove("hidden");
+
+  btn.textContent = "OPNIEUW SPELEN";
+  ui.classList.remove("hidden");
+
+  if (!scoreSaved) {
+    scoreSaved = true;
+    setStatus("Score online opslaan...");
+    saveScore(playerName, score);
+  }
+}
+
+// GAME LOOP
+
+function loop() {
+  if (over) return;
+
+  ctx.clearRect(0, 0, 400, 560);
+
+  // Respawn-timer
+  if (respawning) {
+    respawnTimer--;
+
+    if (respawnTimer <= 0) {
+      respawning = false;
+    }
   }
 
-  playerName = document.getElementById("playerName").value
-    .trim()
-    .replace(/[^a-zA-Z0-9_-]/g, "")
-    .slice(0,10)
-    .toUpperCase();
+  // Beschermingstimer
+  if (invulnerable) {
+    invulnerableTimer--;
 
-  if (!playerName) {
-    setStatus("Please enter your name.");
-    return;
+    if (invulnerableTimer <= 0) {
+      invulnerable = false;
+    }
   }
 
-  runId = null;
+  // Vogel bewegen
+  if (!respawning) {
+    bird.v += bird.g;
+    bird.y += bird.v;
+  }
 
-  if (selectedMode === "multiplayer") {
+  // Obstakels maken
+  if (fc % 95 === 0) {
+    const gap = 130;
+
+    const topHeight =
+      Math.floor(Math.random() * (560 - gap - 120)) + 60;
+
+    pipes.push({
+      x: 400,
+      top: topHeight,
+      bot: topHeight + gap,
+      w: 52,
+      passed: false
+    });
+  }
+
+  ctx.fillStyle = "#22c55e";
+
+  for (let i = pipes.length - 1; i >= 0; i--) {
+    const p = pipes[i];
+
+    p.x -= 2.8;
+
+    ctx.fillRect(p.x, 0, p.w, p.top);
+    ctx.fillRect(p.x, p.bot, p.w, 560 - p.bot);
+
+    // Botsing met obstakel
+    if (
+      !invulnerable &&
+      !respawning &&
+      bird.x + bird.r > p.x &&
+      bird.x - bird.r < p.x + p.w &&
+      (
+        bird.y - bird.r < p.top ||
+        bird.y + bird.r > p.bot
+      )
+    ) {
+      loseLife();
+      break;
+    }
+
+    if (!p.passed && p.x + p.w < bird.x) {
+      p.passed = true;
+      score++;
+    }
+
+    if (p.x + p.w < 0) {
+      pipes.splice(i, 1);
+    }
+  }
+
+  if (over) return;
+
+  // Botsing met boven- of onderkant
+  if (
+    !invulnerable &&
+    !respawning &&
+    (bird.y + bird.r > 560 || bird.y - bird.r < 0)
+  ) {
+    loseLife();
+  }
+
+  if (over) return;
+
+  // Vogel tekenen
+  if (!invulnerable || Math.floor(fc / 5) % 2 === 0) {
+    ctx.fillStyle = "#facc15";
+    ctx.beginPath();
+    ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Oog
+    ctx.fillStyle = "#fff";
+    ctx.beginPath();
+    ctx.arc(bird.x + 5, bird.y - 4, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#020617";
+    ctx.beginPath();
+    ctx.arc(bird.x + 6, bird.y - 4, 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Score
+  ctx.fillStyle = "#fff";
+  ctx.font = "bold 26px monospace";
+  ctx.textAlign = "center";
+  ctx.fillText(score, 200, 45);
+
+  // Levens
+  drawLives();
+
+  // Respawnmelding
+  if (respawning) {
+    ctx.fillStyle = "#38bdf8";
+    ctx.font = "bold 18px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("KLAAR OM VERDER TE VLIEGEN!", 200, 300);
+  }
+
+  fc++;
+  animId = requestAnimationFrame(loop);
+}
+
+// MOBIELE BEDIENING
+
+c.addEventListener("pointerdown", function(event) {
+  event.preventDefault();
+  flap();
+}, { passive: false });
+
+// TOETSENBORD
+
+document.addEventListener("keydown", function(event) {
+  if (
+    event.code === "Space" ||
+    event.code === "ArrowUp"
+  ) {
+    if (!adminPanel.classList.contains("hidden")) return;
+
+    event.preventDefault();
+
+    if (!ui.classList.contains("hidden")) {
+      start();
+    } else {
+      flap();
+    }
+  }
+
+  // ADMIN: CTRL + ALT + E
+  if (
+    event.ctrlKey &&
+    event.altKey &&
+    event.code === "KeyE"
+  ) {
+    event.preventDefault();
+    openAdminPanel();
+  }
+
+  if (event.key === "Escape") {
+    closeAdminPanel();
+  }
+});
+
+// ADMINPANEEL OPENEN
+
+function openAdminPanel() {
+  adminPanel.classList.remove("hidden");
+  adminLogin.classList.remove("hidden");
+  adminContent.classList.add("hidden");
+  adminStatus.textContent = "";
+  adminCodeInput.value = "";
+}
+
+function closeAdminPanel() {
+  adminPanel.classList.add("hidden");
+}
+
+// ADMINVERZOEK
+
+async function adminRequest(action, extra = {}) {
+  if (!db) {
+    throw new Error("Supabase niet beschikbaar.");
+  }
+
+  const { data, error } = await db.functions.invoke("admin-boas", {
+    body: {
+      action,
+      adminCode,
+      ...extra
+    }
+  });
+
+  if (error) {
+    let details = "";
+    let httpStatus = "onbekend";
+
     try {
-      const result = await callFunction("start-run", {playerId});
-      runId = result.runId;
-    } catch (error) {
-      setStatus("Could not start multiplayer: " + error.message);
+      if (error.context) {
+        httpStatus = error.context.status || "onbekend";
+
+        if (typeof error.context.clone === "function") {
+          details = await error.context.clone().text();
+        }
+      }
+    } catch (readError) {
+      console.error("Foutdetails lezen mislukt:", readError);
+    }
+
+    console.error("Admin HTTP-status:", httpStatus);
+    console.error("Admin serverantwoord:", details);
+    console.error("Volledige adminfout:", error);
+
+    throw new Error(
+      "Adminfunctie fout " + httpStatus + ": " +
+      (details || error.message)
+    );
+  }
+
+  if (!data || data.error || data.success === false) {
+    throw new Error(data?.error || "Adminactie mislukt.");
+  }
+
+  return data;
+}
+
+// ADMIN INLOGGEN
+
+document.getElementById("adminLoginButton")
+  .addEventListener("click", async () => {
+    const enteredCode = adminCodeInput.value;
+
+    if (!enteredCode) {
+      adminStatus.textContent = "Vul je admincode in.";
       return;
     }
-  }
 
-  document.getElementById("menu").style.display = "none";
+    adminStatus.textContent = "Controleren...";
 
-  bird = {x:85,y:260,vy:0};
-  score = 0;
-  pipes = [];
-  lastPipe = 0;
+    try {
+      adminCode = enteredCode;
 
-  gameOver = false;
-  gameRunning = true;
+      await adminRequest("verify");
 
-  if (selectedMode === "multiplayer") {
-    await updatePresence();
-  } else if (channel) {
-    await publishPresence();
-  }
-}
+      adminLoggedIn = true;
+      adminLogin.classList.add("hidden");
+      adminContent.classList.remove("hidden");
 
+      adminStatus.textContent = "Succesvol ingelogd.";
 
-/* END GAME */
+      await refreshAdminScores();
+      await refreshAdminBans();
 
-async function endGame() {
-  if (!gameRunning) return;
-
-  gameRunning = false;
-  gameOver = true;
-
-  if (selectedMode === "multiplayer") {
-    await updatePresence();
-
-    if (runId) {
-      try {
-        await callFunction("finish-run", {
-          playerId,
-          runId,
-          name: playerName,
-          score
-        });
-
-        await loadLeaderboard();
-        setStatus("Game over! Score saved: " + score);
-      } catch (error) {
-        setStatus("Score could not be saved: " + error.message);
-      }
+    } catch (error) {
+      adminCode = "";
+      adminLoggedIn = false;
+      adminStatus.textContent = error.message;
     }
-  } else {
-    if (channel) await publishPresence();
-    setStatus("Training finished! Score: " + score);
-  }
-
-  runId = null;
-  document.getElementById("menu").style.display = "block";
-}
-
-
-/* SOUND */
-
-function playSound(frequency = 500, duration = 0.08) {
-  if (!soundOn) return;
-
-  try {
-    audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
-
-    if (audioContext.state === "suspended") {
-      audioContext.resume();
-    }
-
-    const oscillator = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-
-    oscillator.frequency.value = frequency;
-    oscillator.type = "sine";
-
-    gain.gain.setValueAtTime(0.08, audioContext.currentTime);
-    gain.gain.exponentialRampToValueAtTime(
-      0.001,
-      audioContext.currentTime + duration
-    );
-
-    oscillator.connect(gain);
-    gain.connect(audioContext.destination);
-
-    oscillator.start();
-    oscillator.stop(audioContext.currentTime + duration);
-  } catch (error) {
-    console.warn("Audio unavailable:", error);
-  }
-}
-
-
-/* GAME LOGIC */
-
-function flap() {
-  if (!gameRunning) return;
-
-  bird.vy = jump;
-  playSound(650);
-}
-
-function addPipe() {
-  const gap = 155;
-  const top = 60 + Math.random() * 220;
-
-  pipes.push({
-    x:410,
-    top,
-    gap,
-    passed:false
-  });
-}
-
-function drawBird(x,y,color,label) {
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.arc(x,y,13,0,Math.PI*2);
-  ctx.fill();
-
-  ctx.fillStyle = "#172033";
-  ctx.beginPath();
-  ctx.arc(x+4,y-4,2.5,0,Math.PI*2);
-  ctx.fill();
-
-  if (label) {
-    ctx.fillStyle = "#102033";
-    ctx.font = "11px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(label,x,y-19);
-  }
-}
-
-function draw() {
-  ctx.clearRect(0,0,400,560);
-
-  ctx.fillStyle = "#8ed8ff";
-  ctx.fillRect(0,0,400,560);
-
-  ctx.fillStyle = "#d8f5ff";
-  ctx.beginPath();
-  ctx.arc(70,90,28,0,Math.PI*2);
-  ctx.arc(100,90,22,0,Math.PI*2);
-  ctx.arc(125,90,28,0,Math.PI*2);
-  ctx.fill();
-
-  ctx.fillStyle = "#6fc34a";
-  ctx.fillRect(0,520,400,40);
-
-  pipes.forEach(p => {
-    ctx.fillStyle = "#269b48";
-    ctx.fillRect(p.x,0,55,p.top);
-    ctx.fillRect(p.x,p.top+p.gap,55,520-(p.top+p.gap));
-
-    ctx.fillStyle = "#167c38";
-    ctx.fillRect(p.x-5,p.top-16,65,16);
-    ctx.fillRect(p.x-5,p.top+p.gap,65,16);
   });
 
-  if (gameRunning || gameOver) {
-    drawBird(bird.x,bird.y,playerColor,playerName);
-  }
+// ADMIN SCORES LADEN
 
-  if (selectedMode === "multiplayer" || isAdmin) {
-    remotePlayers.forEach(p => {
-      drawBird(
-        Number(p.x) || 85,
-        Number(p.y) || 260,
-        p.color || "#ffffff",
-        p.name
-      );
-    });
-  }
+async function refreshAdminScores() {
+  if (!adminLoggedIn) return;
 
-  ctx.fillStyle = "#102033";
-  ctx.font = "bold 30px Arial";
-  ctx.textAlign = "center";
-  ctx.fillText(String(score),200,45);
+  adminStatus.textContent = "Scores ophalen...";
 
-  if (!gameRunning && !gameOver) {
-    ctx.font = "bold 23px Arial";
-    ctx.fillText("FLAPPY ARCADE",200,250);
+  try {
+    const result = await adminRequest("list-scores");
+    adminScores.innerHTML = "";
 
-    ctx.font = "16px Arial";
-    ctx.fillText("Choose a mode and press PLAY",200,285);
-  }
-
-  if (gameOver) {
-    ctx.fillStyle = "rgba(0,0,0,.55)";
-    ctx.fillRect(0,0,400,560);
-
-    ctx.fillStyle = "white";
-    ctx.font = "bold 34px Arial";
-    ctx.fillText("GAME OVER",200,260);
-
-    ctx.font = "22px Arial";
-    ctx.fillText("Score: " + score,200,300);
-  }
-}
-
-function update() {
-  if (gameRunning) {
-    bird.vy += gravity;
-    bird.y += bird.vy;
-
-    if (Date.now() - lastPipe > 1500) {
-      addPipe();
-      lastPipe = Date.now();
+    if (!result.scores || result.scores.length === 0) {
+      adminScores.textContent = "Geen scores gevonden.";
     }
 
-    pipes.forEach(p => {
-      p.x -= 2.5;
+    (result.scores || []).forEach(item => {
+      const row = document.createElement("div");
+      row.className = "admin-row";
 
-      if (!p.passed && p.x + 55 < bird.x) {
-        p.passed = true;
-        score++;
-        playSound(850,0.05);
-      }
+      const info = document.createElement("p");
+      info.textContent =
+        "ID: " + item.id + " | " + item.name + " | Score: " + item.score;
 
-      const withinX =
-        bird.x + 11 > p.x &&
-        bird.x - 11 < p.x + 55;
+      const edit = document.createElement("button");
+      edit.className = "blue";
+      edit.textContent = "AANPASSEN";
 
-      const outsideGap =
-        bird.y - 11 < p.top ||
-        bird.y + 11 > p.top + p.gap;
+      edit.addEventListener("click", async () => {
+        const newName = prompt("Nieuwe naam:", item.name);
+        if (newName === null) return;
 
-      if (withinX && outsideGap && gameRunning) {
-        endGame();
-      }
+        const newScore = prompt("Nieuwe score:", item.score);
+        if (newScore === null) return;
+
+        try {
+          await adminRequest("update-score", {
+            id: String(item.id),
+            name: newName,
+            score: newScore
+          });
+
+          adminStatus.textContent = "Score aangepast.";
+          await refreshAdminScores();
+          await loadLeaderboard();
+
+        } catch (error) {
+          adminStatus.textContent = error.message;
+        }
+      });
+
+      const remove = document.createElement("button");
+      remove.className = "danger";
+      remove.textContent = "VERWIJDEREN";
+
+      remove.addEventListener("click", async () => {
+        if (!confirm("Deze score verwijderen?")) return;
+
+        try {
+          await adminRequest("delete-score", {
+            id: String(item.id)
+          });
+
+          adminStatus.textContent = "Score verwijderd.";
+          await refreshAdminScores();
+          await loadLeaderboard();
+
+        } catch (error) {
+          adminStatus.textContent = error.message;
+        }
+      });
+
+      row.appendChild(info);
+      row.appendChild(edit);
+      row.appendChild(remove);
+      adminScores.appendChild(row);
     });
 
-    pipes = pipes.filter(p => p.x > -70);
+    adminStatus.textContent = "Scores geladen.";
 
-    if ((bird.y > 508 || bird.y < 0) && gameRunning) {
-      endGame();
+  } catch (error) {
+    adminStatus.textContent = error.message;
+  }
+}
+
+// BANLIJST LADEN
+
+function formatBanExpiry(expiresAt) {
+  if (!expiresAt) return "Permanent";
+  const date = new Date(expiresAt);
+  return "Tot " + date.toLocaleString("nl-BE");
+}
+
+async function refreshAdminBans() {
+  if (!adminLoggedIn) return;
+
+  try {
+    const result = await adminRequest("list-bans");
+    adminBans.innerHTML = "";
+
+    const playerBans = (result.bans || []).map(item => ({
+      kind: "player",
+      id: item.id,
+      label: item.player_name || item.player_id,
+      detail: "Speler-ID: " + item.player_id,
+      reason: item.reason,
+      expiresAt: item.expires_at
+    }));
+
+    const nameBans = (result.nameBans || []).map(item => ({
+      kind: "name",
+      id: item.id,
+      label: item.player_name,
+      detail: "Ban op spelersnaam",
+      reason: item.reason,
+      expiresAt: item.expires_at
+    }));
+
+    const allBans = [...nameBans, ...playerBans];
+
+    if (allBans.length === 0) {
+      adminBans.textContent = "Geen actieve bans.";
+      return;
     }
 
-    if (selectedMode === "multiplayer" && Math.random() < 0.08) {
-      updatePresence();
+    allBans.forEach(item => {
+      const row = document.createElement("div");
+      row.className = "admin-row";
+
+      const info = document.createElement("p");
+      info.textContent =
+        item.label + " — " + item.detail +
+        " — " + formatBanExpiry(item.expiresAt) +
+        (item.reason ? " — Reden: " + item.reason : "");
+
+      const remove = document.createElement("button");
+      remove.className = "danger";
+      remove.textContent = "UNBANNEN";
+
+      remove.addEventListener("click", async () => {
+        if (!confirm("Ban van " + item.label + " verwijderen?")) return;
+
+        try {
+          if (item.kind === "name") {
+            await adminRequest("unban-name", {
+              playerName: item.label
+            });
+          } else {
+            await adminRequest("unban-player", {
+              playerId: (result.bans || []).find(x => x.id === item.id).player_id
+            });
+          }
+
+          adminStatus.textContent = "Ban verwijderd.";
+          await refreshAdminBans();
+        } catch (error) {
+          adminStatus.textContent = error.message;
+        }
+      });
+
+      row.appendChild(info);
+      row.appendChild(remove);
+      adminBans.appendChild(row);
+    });
+
+    adminStatus.textContent = "Banlijst geladen.";
+  } catch (error) {
+    adminBans.textContent = "Banlijst laden mislukt: " + error.message;
+    adminStatus.textContent = error.message;
+  }
+}
+
+// AANGEPASTE BANPERIODE TONEN
+
+document.getElementById("banDuration").addEventListener("change", event => {
+  document.getElementById("customBanFields")
+    .classList.toggle("hidden", event.target.value !== "custom");
+});
+
+// NAAM BANNEN
+
+document.getElementById("banNameButton").addEventListener("click", async () => {
+  const playerNameToBan = document.getElementById("banName").value
+    .replace(/[^a-zA-Z0-9_-]/g, "")
+    .slice(0, 10)
+    .toUpperCase();
+
+  const durationChoice = document.getElementById("banDuration").value;
+  const reason = document.getElementById("banReason").value;
+
+  if (!playerNameToBan) {
+    adminStatus.textContent = "Vul een geldige spelersnaam in.";
+    return;
+  }
+
+  let permanent = durationChoice === "permanent";
+  let durationMinutes = null;
+
+  if (!permanent && durationChoice === "custom") {
+    const amount = Number(document.getElementById("customBanAmount").value);
+    const unit = document.getElementById("customBanUnit").value;
+
+    if (!Number.isInteger(amount) || amount < 1) {
+      adminStatus.textContent = "Vul een geldige aangepaste duur in.";
+      return;
     }
-  }
 
-  draw();
-  requestAnimationFrame(update);
-}
+    const multiplier = unit === "days" ? 1440 :
+      unit === "hours" ? 60 : 1;
 
+    durationMinutes = amount * multiplier;
 
-/* LEADERBOARD */
-
-async function loadLeaderboard() {
-  try {
-    const {data,error} = await db
-      .from("flappy_scores")
-      .select("name,score")
-      .order("score",{ascending:false})
-      .limit(5);
-
-    if (error) throw error;
-
-    const el = document.getElementById("leaderboard");
-    el.innerHTML = "";
-
-    (data || []).forEach((s,i) => {
-      const row = document.createElement("p");
-      row.textContent = (i+1) + ". " + s.name + " – " + s.score;
-      el.appendChild(row);
-    });
-
-    if (!data?.length) {
-      el.textContent = "No scores yet.";
+    if (durationMinutes > 525600) {
+      adminStatus.textContent = "De maximale banperiode is 365 dagen.";
+      return;
     }
-  } catch (error) {
-    document.getElementById("leaderboard").textContent =
-      "Leaderboard unavailable.";
-  }
-}
-
-
-/* ADMIN */
-
-async function adminAction(action, extra={}) {
-  if (!adminCode) {
-    throw new Error("Not logged in.");
+  } else if (!permanent) {
+    durationMinutes = Number(durationChoice);
   }
 
-  return callFunction(action,{adminCode,...extra});
-}
-
-async function loginAdmin() {
-  const code = prompt("Enter the admin code:");
-
-  if (!code) return;
+  if (!confirm(
+    "Spelersnaam " + playerNameToBan + " bannen" +
+    (permanent ? " (permanent)?" : " voor " + durationMinutes + " minuten?")
+  )) return;
 
   try {
-    await callFunction("verify",{adminCode:code});
+    adminStatus.textContent = "Ban instellen...";
 
-    adminCode = code;
-    isAdmin = true;
-
-    document.getElementById("admin").style.display = "block";
-    document.getElementById("adminStatus").textContent = "Admin logged in";
-
-    renderPlayerList();
-    await loadBans();
-  } catch (error) {
-    alert("Admin login failed: " + error.message);
-  }
-}
-
-async function loadBans() {
-  try {
-    const result = await adminAction("list-bans");
-
-    const el = document.getElementById("banList");
-    el.innerHTML = "<h3>Active bans</h3>";
-
-    (result.bans || []).forEach(b => {
-      const p = document.createElement("p");
-
-      p.textContent =
-        b.player_name + " – until " +
-        new Date(b.expires_at).toLocaleString("en-GB");
-
-      el.appendChild(p);
-    });
-  } catch (error) {
-    document.getElementById("banList").textContent = error.message;
-  }
-}
-
-async function banSelectedPlayer() {
-  if (!selectedPlayer) {
-    return alert("Select a player first.");
-  }
-
-  let minutes = document.getElementById("banDuration").value;
-
-  if (minutes === "custom") {
-    minutes = Number(document.getElementById("customMinutes").value);
-  } else {
-    minutes = Number(minutes);
-  }
-
-  if (!Number.isInteger(minutes) || minutes < 1 || minutes > 525600) {
-    return alert("Choose a valid duration.");
-  }
-
-  try {
-    await adminAction("ban-player",{
-      playerId:selectedPlayer.playerId,
-      playerName:selectedPlayer.name,
-      durationMinutes:minutes,
-      reason:document.getElementById("banReason").value
+    await adminRequest("ban-name", {
+      playerName: playerNameToBan,
+      durationMinutes,
+      permanent,
+      reason
     });
 
-    alert("Player banned.");
-    await loadBans();
+    document.getElementById("banName").value = "";
+    document.getElementById("banReason").value = "";
+    adminStatus.textContent = playerNameToBan + " is geband.";
+
+    await refreshAdminBans();
   } catch (error) {
-    alert("Ban failed: " + error.message);
-  }
-}
-
-async function unbanSelectedPlayer() {
-  if (!selectedPlayer) {
-    return alert("Select a player first.");
-  }
-
-  try {
-    await adminAction("unban-player",{
-      playerId:selectedPlayer.playerId
-    });
-
-    alert("Ban removed.");
-    await loadBans();
-  } catch (error) {
-    alert(error.message);
-  }
-}
-
-
-/* BUTTONS */
-
-document.getElementById("trainingBtn").onclick = () => {
-  selectMode("training");
-};
-
-document.getElementById("multiplayerBtn").onclick = () => {
-  selectMode("multiplayer");
-};
-
-document.getElementById("playBtn").onclick = startGame;
-
-document.getElementById("restartBtn").onclick = async () => {
-  if (gameRunning) {
-    await endGame();
-  }
-
-  gameOver = false;
-  gameRunning = false;
-  runId = null;
-
-  document.getElementById("menu").style.display = "block";
-
-  bird = {x:85,y:260,vy:0};
-  pipes = [];
-  score = 0;
-
-  draw();
-};
-
-document.getElementById("banBtn").onclick = banSelectedPlayer;
-document.getElementById("unbanBtn").onclick = unbanSelectedPlayer;
-document.getElementById("refreshBans").onclick = loadBans;
-
-document.getElementById("adminLogout").onclick = () => {
-  adminCode = null;
-  isAdmin = false;
-  selectedPlayer = null;
-
-  document.getElementById("admin").style.display = "none";
-};
-
-document.getElementById("soundBtn").onclick = () => {
-  soundOn = !soundOn;
-
-  document.getElementById("soundBtn").textContent =
-    "Sound: " + (soundOn ? "On" : "Off");
-
-  if (soundOn) playSound(500);
-};
-
-
-/* CONTROLS */
-
-canvas.addEventListener("pointerdown",flap);
-
-document.addEventListener("keydown",e => {
-  if (e.code === "Space" || e.code === "ArrowUp") {
-    e.preventDefault();
-    flap();
-  }
-
-  if (e.ctrlKey && e.altKey && e.code === "KeyQ") {
-    loginAdmin();
+    adminStatus.textContent = "Bannen mislukt: " + error.message;
   }
 });
 
+// BANLIJST VERVERSEN
 
-/* INITIALIZATION */
+document.getElementById("refreshBansButton")
+  .addEventListener("click", refreshAdminBans);
 
-connectMultiplayer();
+// SCORE TOEVOEGEN
 
+document.getElementById("addScoreButton")
+  .addEventListener("click", async () => {
+    const name = document.getElementById("newName").value;
+    const scoreValue = document.getElementById("newScore").value;
+
+    if (!name.trim() || scoreValue === "") {
+      adminStatus.textContent = "Vul naam en score in.";
+      return;
+    }
+
+    try {
+      await adminRequest("add-score", {
+        name,
+        score: scoreValue
+      });
+
+      document.getElementById("newName").value = "";
+      document.getElementById("newScore").value = "";
+
+      adminStatus.textContent = "Score toegevoegd.";
+
+      await refreshAdminScores();
+      await loadLeaderboard();
+
+    } catch (error) {
+      adminStatus.textContent = error.message;
+    }
+  });
+
+// SCORES VERVERSEN
+
+document.getElementById("refreshScoresButton")
+  .addEventListener("click", refreshAdminScores);
+
+// ADMIN UITLOGGEN
+
+document.getElementById("adminLogoutButton")
+  .addEventListener("click", () => {
+    adminCode = "";
+    adminLoggedIn = false;
+    adminBans.innerHTML = "";
+
+    adminLogin.classList.remove("hidden");
+    adminContent.classList.add("hidden");
+
+    adminPanel.classList.add("hidden");
+  });
+
+// ADMIN SLUITEN
+
+document.getElementById("adminCloseLogin")
+  .addEventListener("click", closeAdminPanel);
+
+// FOUTEN
+
+window.addEventListener("error", function(event) {
+  console.error("JavaScript fout:", event.message);
+});
+
+window.addEventListener("unhandledrejection", function(event) {
+  console.error("Onverwachte fout:", event.reason);
+});
+
+// START
+
+updateMusicButton();
 loadLeaderboard();
 
-checkBan().catch(() => {
-  setStatus("Server temporarily unavailable.");
-});
-
-update();
 </script>
 </body>
 </html>
