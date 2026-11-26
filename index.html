@@ -1,6 +1,5 @@
-
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -62,6 +61,7 @@ button {
 
 button:disabled {
   opacity: .6;
+  cursor: not-allowed;
 }
 
 input {
@@ -291,6 +291,72 @@ li {
 .blue {
   background: #38bdf8;
 }
+
+.replay-section {
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 18px;
+}
+
+.replay-section h3 {
+  color: #a78bfa;
+  margin: 10px 0;
+}
+
+#replayCanvas {
+  width: min(300px, 100%);
+  height: auto;
+  aspect-ratio: 5 / 7;
+  border: 2px solid #38bdf8;
+  border-radius: 8px;
+  background: #0f172a;
+  margin: 10px auto;
+  touch-action: auto;
+}
+
+#replaySlider {
+  width: 95%;
+  margin: 10px 0;
+  accent-color: #38bdf8;
+}
+
+.replay-info {
+  color: #94a3b8;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  margin: 6px;
+}
+
+.replay-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.replay-controls button {
+  padding: 8px 10px;
+  font-size: 11px;
+}
+
+.jump-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #334155;
+  padding: 7px 3px;
+  font-size: 11px;
+  text-align: left;
+}
+
+.jump-row button {
+  padding: 6px 9px;
+  font-size: 10px;
+  flex-shrink: 0;
+}
 </style>
 </head>
 
@@ -300,100 +366,145 @@ li {
 
   <canvas id="c" width="400" height="560"></canvas>
 
-  <button id="musicToggle" type="button">MUZIEK: AAN</button>
+  <button id="musicToggle" type="button">MUSIC: ON</button>
 
   <div id="intro">
     <h1 id="introLogo">FLAPPY ARCADE</h1>
     <div id="introBird">🐤</div>
     <p id="introTag">GET READY TO FLY</p>
-    <p id="introCountdown">START DE INTRO</p>
+    <p id="introCountdown">START THE INTRO</p>
     <button id="introStart" type="button">START INTRO</button>
   </div>
 
   <audio id="startupMusic" src="flappy_arcade_theme.wav" preload="auto"></audio>
+  <audio id="gameMusic" src="flappy_arcade_game_music.wav" preload="auto" loop></audio>
 
   <div id="ui" class="hidden">
     <h1 id="t" style="color:#facc15">FLAPPY ARCADE</h1>
 
     <p style="color:#94a3b8;font-size:13px">
-      Tik, klik of spatiebalk om te vliegen
+      Tap, click or press SPACE to fly
     </p>
 
     <p id="fs" class="hidden" style="font-size:17px"></p>
 
-    <input id="n" maxlength="10" placeholder="JOUW NAAM">
+    <input id="n" maxlength="10" placeholder="YOUR NAME">
 
-    <h3 style="color:#38bdf8">ONLINE TOP 5 RANGLIJST</h3>
+    <h3 style="color:#38bdf8">ONLINE TOP 5 LEADERBOARD</h3>
 
     <ul id="lb"></ul>
 
-    <p id="status">Online ranglijst laden...</p>
+    <p id="status">Loading online leaderboard...</p>
 
-    <button id="btn" type="button">SPEEL NU</button>
+    <button id="btn" type="button">PLAY NOW</button>
   </div>
 
   <div id="adminPanel" class="hidden">
     <h2>FLAPPY ARCADE ADMIN</h2>
-    <p style="color:#94a3b8;font-size:11px">Openen met Ctrl + Alt + E · Sluiten met Escape</p>
+    <p style="color:#94a3b8;font-size:11px">Open with Ctrl + Alt + E · Close with Escape</p>
 
     <section id="adminLogin">
-      <p>Voer je admincode in</p>
-      <input id="adminCodeInput" type="password" placeholder="ADMINCODE" autocomplete="off">
+      <p>Enter your admin code</p>
+      <input id="adminCodeInput" type="password" placeholder="ADMIN CODE" autocomplete="off">
 
       <div class="admin-actions">
-        <button id="adminLoginButton" type="button">INLOGGEN</button>
-        <button id="adminCloseLogin" class="danger" type="button">SLUITEN</button>
+        <button id="adminLoginButton" type="button">LOG IN</button>
+        <button id="adminCloseLogin" class="danger" type="button">CLOSE</button>
       </div>
     </section>
 
     <section id="adminContent" class="hidden">
-      <h3 style="color:#facc15">SCORE TOEVOEGEN</h3>
 
-      <input id="newName" maxlength="10" placeholder="NAAM">
+      <h3 style="color:#facc15">ADD SCORE</h3>
+
+      <input id="newName" maxlength="10" placeholder="PLAYER NAME">
       <input id="newScore" type="number" min="0" max="999999" placeholder="SCORE">
 
       <div class="admin-actions">
-        <button id="addScoreButton" type="button">SCORE TOEVOEGEN</button>
-        <button id="refreshScoresButton" class="blue" type="button">VERNIEUWEN</button>
-        <button id="adminLogoutButton" class="danger" type="button">UITLOGGEN</button>
+        <button id="addScoreButton" type="button">ADD SCORE</button>
+        <button id="refreshScoresButton" class="blue" type="button">REFRESH SCORES</button>
+        <button id="adminLogoutButton" class="danger" type="button">LOG OUT</button>
       </div>
 
-      <h3 style="color:#38bdf8">BESTAANDE SCORES</h3>
+      <h3 style="color:#38bdf8">EXISTING SCORES</h3>
       <div id="adminScores"></div>
 
       <hr style="border:1px solid #334155;margin:18px 0">
 
-      <h3 style="color:#ef4444">SPELER OP NAAM BANNEN</h3>
-      <input id="banName" maxlength="10" placeholder="SPELERSNAAM">
+      <h3 style="color:#ef4444">BAN PLAYER BY NAME</h3>
+
+      <input id="banName" maxlength="10" placeholder="PLAYER NAME">
 
       <select id="banDuration">
-        <option value="10">10 minuten</option>
-        <option value="60">1 uur</option>
-        <option value="1440">24 uur</option>
-        <option value="10080">7 dagen</option>
-        <option value="43200">30 dagen</option>
-        <option value="custom">Aangepaste duur</option>
+        <option value="10">10 minutes</option>
+        <option value="60">1 hour</option>
+        <option value="1440">24 hours</option>
+        <option value="10080">7 days</option>
+        <option value="43200">30 days</option>
+        <option value="custom">Custom duration</option>
         <option value="permanent">Permanent</option>
       </select>
 
       <div id="customBanFields" class="hidden">
-        <input id="customBanAmount" type="number" min="1" max="365" placeholder="Aantal">
+        <input id="customBanAmount" type="number" min="1" max="365" placeholder="Amount">
         <select id="customBanUnit">
-          <option value="minutes">Minuten</option>
-          <option value="hours">Uren</option>
-          <option value="days">Dagen</option>
+          <option value="minutes">Minutes</option>
+          <option value="hours">Hours</option>
+          <option value="days">Days</option>
         </select>
       </div>
 
-      <input id="banReason" maxlength="120" placeholder="Reden (optioneel)">
+      <input id="banReason" maxlength="120" placeholder="Reason (optional)">
 
       <div class="admin-actions">
-        <button id="banNameButton" class="danger" type="button">NAAM BANNEN</button>
-        <button id="refreshBansButton" class="blue" type="button">BANLIJST VERVERSEN</button>
+        <button id="banNameButton" class="danger" type="button">BAN NAME</button>
+        <button id="refreshBansButton" class="blue" type="button">REFRESH BANS</button>
       </div>
 
-      <h3 style="color:#ef4444">ACTIEVE BANS</h3>
+      <h3 style="color:#ef4444">ACTIVE BANS</h3>
       <div id="adminBans"></div>
+
+      <hr style="border:1px solid #334155;margin:18px 0">
+
+      <section class="replay-section">
+        <h3>REPLAY CENTER</h3>
+        <p class="replay-info">
+          View complete game replays and inspect every recorded jump.
+        </p>
+
+        <div class="admin-actions">
+          <button id="refreshReplaysButton" class="blue" type="button">REFRESH REPLAYS</button>
+        </div>
+
+        <div id="adminReplays">No replays loaded.</div>
+
+        <hr style="border:1px solid #334155;margin:15px 0">
+
+        <h3>REPLAY PLAYER</h3>
+
+        <p id="replaySelectedInfo" class="replay-info">
+          Select a replay to start viewing.
+        </p>
+
+        <canvas id="replayCanvas" width="400" height="560"></canvas>
+
+        <p id="replayFrameInfo" class="replay-info">No replay selected.</p>
+
+        <input id="replaySlider" type="range" min="0" max="0" value="0" disabled>
+
+        <div class="replay-controls">
+          <button id="replayPlayButton" type="button" disabled>PLAY</button>
+          <button id="replayPauseButton" type="button" disabled>PAUSE</button>
+          <button id="replayPreviousJump" type="button" disabled>PREVIOUS JUMP</button>
+          <button id="replayNextJump" type="button" disabled>NEXT JUMP</button>
+        </div>
+
+        <h3>JUMP ANALYSIS</h3>
+        <div id="replayJumps">
+          Select a replay to view its jumps.
+        </div>
+      </section>
+
     </section>
 
     <p id="adminStatus"></p>
@@ -406,7 +517,9 @@ li {
 <script>
 "use strict";
 
+// ============================================
 // SUPABASE
+// ============================================
 
 const SUPABASE_URL = "https://ilgdnvtdmzjrclybbexi.supabase.co";
 const SUPABASE_KEY = "sb_publishable_6kZmesu_W4jgVmDKDw6v8Q_Y5SlesV0";
@@ -418,10 +531,12 @@ try {
     db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   }
 } catch (error) {
-  console.error("Supabase fout:", error);
+  console.error("Supabase error:", error);
 }
 
-// ELEMENTEN
+// ============================================
+// ELEMENTS
+// ============================================
 
 const c = document.getElementById("c");
 const ctx = c.getContext("2d");
@@ -438,6 +553,7 @@ const intro = document.getElementById("intro");
 const introStart = document.getElementById("introStart");
 const introCountdown = document.getElementById("introCountdown");
 const startupMusic = document.getElementById("startupMusic");
+const gameMusic = document.getElementById("gameMusic");
 const musicToggle = document.getElementById("musicToggle");
 
 const adminPanel = document.getElementById("adminPanel");
@@ -447,11 +563,21 @@ const adminCodeInput = document.getElementById("adminCodeInput");
 const adminStatus = document.getElementById("adminStatus");
 const adminScores = document.getElementById("adminScores");
 const adminBans = document.getElementById("adminBans");
+const adminReplays = document.getElementById("adminReplays");
+
+const replayCanvas = document.getElementById("replayCanvas");
+const replayCtx = replayCanvas.getContext("2d");
+const replaySlider = document.getElementById("replaySlider");
+const replayFrameInfo = document.getElementById("replayFrameInfo");
+const replaySelectedInfo = document.getElementById("replaySelectedInfo");
+const replayJumps = document.getElementById("replayJumps");
 
 let adminCode = "";
 let adminLoggedIn = false;
 
-// VEILIG OPSLAAN
+// ============================================
+// SAFE LOCAL STORAGE
+// ============================================
 
 function safeGet(key) {
   try {
@@ -465,26 +591,47 @@ function safeSet(key, value) {
   try {
     localStorage.setItem(key, value);
   } catch (error) {
-    console.warn("Opslaan niet mogelijk:", error);
+    console.warn("Storage unavailable:", error);
   }
 }
 
 n.value = safeGet("flappy_name");
 
 let playerId = safeGet("flappy_player_id");
+
 if (!playerId) {
   playerId = (crypto.randomUUID
     ? crypto.randomUUID()
     : "player-" + Date.now() + "-" + Math.random().toString(36).slice(2));
+
   safeSet("flappy_player_id", playerId);
 }
 
-// MUZIEK
+// ============================================
+// MUSIC
+// ============================================
 
 let musicEnabled = true;
 
 function updateMusicButton() {
-  musicToggle.textContent = musicEnabled ? "MUZIEK: AAN" : "MUZIEK: UIT";
+  musicToggle.textContent = musicEnabled ? "MUSIC: ON" : "MUSIC: OFF";
+}
+
+function pauseAllMusic() {
+  startupMusic.pause();
+  gameMusic.pause();
+}
+
+function startGameMusic() {
+  if (!musicEnabled) return;
+
+  startupMusic.pause();
+  gameMusic.volume = 0.45;
+  gameMusic.currentTime = 0;
+
+  gameMusic.play().catch(error => {
+    console.log("Game music could not start:", error);
+  });
 }
 
 async function toggleMusic() {
@@ -492,21 +639,26 @@ async function toggleMusic() {
   updateMusicButton();
 
   if (!musicEnabled) {
-    startupMusic.pause();
+    pauseAllMusic();
     return;
   }
 
-  try {
+  if (gameRunning) {
+    startGameMusic();
+  } else if (!intro.classList.contains("hidden")) {
     startupMusic.volume = 0.85;
-    await startupMusic.play();
-  } catch (error) {
-    console.log("Muziek kan niet automatisch starten:", error);
+
+    startupMusic.play().catch(error => {
+      console.log("Intro music could not start:", error);
+    });
   }
 }
 
 musicToggle.addEventListener("click", toggleMusic);
 
+// ============================================
 // INTRO
+// ============================================
 
 let introRunning = false;
 
@@ -515,7 +667,7 @@ function beginIntro() {
 
   introRunning = true;
   introStart.disabled = true;
-  introStart.textContent = "START...";
+  introStart.textContent = "STARTING...";
   introCountdown.textContent = "5";
 
   if (musicEnabled) {
@@ -523,7 +675,7 @@ function beginIntro() {
     startupMusic.volume = 0.85;
 
     startupMusic.play().catch(error => {
-      console.log("Muziek niet beschikbaar:", error);
+      console.log("Intro music unavailable:", error);
     });
   }
 
@@ -555,7 +707,9 @@ function beginIntro() {
 
 introStart.addEventListener("click", beginIntro);
 
-// SPELVARIABELEN
+// ============================================
+// GAME VARIABLES
+// ============================================
 
 let bird;
 let pipes = [];
@@ -563,7 +717,7 @@ let score = 0;
 let over = true;
 let fc = 0;
 let animId = 0;
-let playerName = "SPELER";
+let playerName = "PLAYER";
 let gameRunning = false;
 let startingGame = false;
 let currentRunId = null;
@@ -575,20 +729,85 @@ let respawning = false;
 let respawnTimer = 0;
 let scoreSaved = false;
 
+// ============================================
+// REPLAY RECORDING
+// ============================================
+
+let replaySeed = 0;
+let replayEvents = [];
+let replayKeyframes = [];
+let replayStride = 10;
+let replayRecording = false;
+
+function recordReplayEvent(event) {
+  if (!replayRecording) return;
+
+  if (replayEvents.length >= 24999) return;
+
+  replayEvents.push({
+    ...event,
+    tick: fc
+  });
+}
+
+function captureReplayFrame(force = false) {
+  if (!replayRecording || !bird) return;
+
+  if (!force && fc % replayStride !== 0) return;
+
+  // Increase the interval if the replay approaches the storage limit.
+  if (replayKeyframes.length >= 2900 && replayStride < 1000) {
+    replayStride = Math.min(replayStride * 2, 1000);
+  }
+
+  if (replayKeyframes.length >= 3000) return;
+
+  replayKeyframes.push({
+    tick: fc,
+    x: bird.x,
+    y: Math.round(bird.y * 100) / 100,
+    v: Math.round(bird.v * 100) / 100,
+    score,
+    lives,
+    inv: invulnerable ? 1 : 0,
+    resp: respawning ? 1 : 0,
+
+    pipes: pipes.map(p => ({
+      x: Math.round(p.x * 100) / 100,
+      top: p.top,
+      bot: p.bot,
+      w: p.w,
+      passed: p.passed ? 1 : 0
+    }))
+  });
+}
+
+function resetReplayRecording() {
+  replaySeed = Math.floor(Math.random() * 2000000000);
+  replayEvents = [];
+  replayKeyframes = [];
+  replayStride = 10;
+  replayRecording = true;
+}
+
+// ============================================
 // STATUS
+// ============================================
 
 function setStatus(message) {
   status.textContent = message;
 }
 
-// RANGLIJST
+// ============================================
+// LEADERBOARD
+// ============================================
 
 function showLB(list, currentName = "", currentScore = -1) {
   lb.innerHTML = "";
 
   if (!list || list.length === 0) {
     const li = document.createElement("li");
-    li.textContent = "Nog geen scores";
+    li.textContent = "No scores yet";
     lb.appendChild(li);
     return;
   }
@@ -615,11 +834,9 @@ function showLB(list, currentName = "", currentScore = -1) {
   });
 }
 
-// SCORES LADEN
-
 async function loadLeaderboard(currentName = "", currentScore = -1) {
   if (!db) {
-    setStatus("Supabase niet beschikbaar.");
+    setStatus("Supabase is unavailable.");
     showLB([]);
     return;
   }
@@ -635,29 +852,32 @@ async function loadLeaderboard(currentName = "", currentScore = -1) {
     if (error) throw error;
 
     showLB(data, currentName, currentScore);
-    setStatus("ONLINE - Scores gedeeld met iedereen");
+    setStatus("ONLINE - Scores shared with everyone");
 
   } catch (error) {
-    console.error("Leaderboard laden mislukt:", error);
-    setStatus("Fout bij laden: " + error.message);
+    console.error("Leaderboard loading failed:", error);
+    setStatus("Loading error: " + error.message);
   }
 }
 
-// VERZOEKEN NAAR DE SPELFUNCTIE
+// ============================================
+// GAME BACKEND REQUESTS
+// ============================================
 
 async function gameRequest(action, extra = {}) {
-  if (!db) throw new Error("Supabase niet beschikbaar.");
+  if (!db) throw new Error("Supabase is unavailable.");
 
   const { data, error } = await db.functions.invoke("admin-boas", {
     body: { action, ...extra }
   });
 
   if (error) {
-    let message = error.message || "Verzoek mislukt.";
+    let message = error.message || "Request failed.";
 
     try {
       if (error.context && typeof error.context.clone === "function") {
         const responseBody = await error.context.clone().json();
+
         if (responseBody && responseBody.error) {
           message = responseBody.error;
         }
@@ -674,17 +894,47 @@ async function gameRequest(action, extra = {}) {
   return data;
 }
 
-// SCORE OPSLAAN VIA DE ANTI-CHEAT- EN BANCONTROLE
+// ============================================
+// SAVE REPLAY AND SCORE
+// ============================================
 
 async function saveScore(name, newScore) {
   if (!db || !currentRunId) {
-    setStatus("Score niet opgeslagen: speel opnieuw.");
+    setStatus("Score not saved. Please play again.");
     return;
+  }
+
+  const runIdToSave = currentRunId;
+
+  // Save the replay first. A replay error must not prevent score saving.
+  try {
+    replayRecording = false;
+
+    const replayData = {
+      version: 1,
+      seed: replaySeed,
+      durationTicks: Math.max(1, fc),
+      jumpCount: replayEvents.filter(event => event.type === "jump").length,
+      events: replayEvents,
+      keyframes: replayKeyframes
+    };
+
+    await gameRequest("save-replay", {
+      runId: runIdToSave,
+      playerId,
+      replay: replayData
+    });
+
+    console.log("Replay saved successfully.");
+
+  } catch (replayError) {
+    console.error("Replay saving failed:", replayError);
+    setStatus("Replay could not be saved. Saving score...");
   }
 
   try {
     const result = await gameRequest("finish-run", {
-      runId: currentRunId,
+      runId: runIdToSave,
       playerId,
       name,
       score: newScore
@@ -693,20 +943,22 @@ async function saveScore(name, newScore) {
     currentRunId = null;
 
     if (!result || !result.success) {
-      throw new Error(result?.error || "Score kon niet worden opgeslagen.");
+      throw new Error(result?.error || "Score could not be saved.");
     }
 
-    setStatus("Score online opgeslagen!");
+    setStatus("Score and game result saved online!");
     await loadLeaderboard(name, newScore);
 
   } catch (error) {
-    console.error("Score opslaan mislukt:", error);
+    console.error("Score saving failed:", error);
     currentRunId = null;
-    setStatus("Score niet opgeslagen: " + error.message);
+    setStatus("Score not saved: " + error.message);
   }
 }
 
-// LEVENS WEERGEVEN
+// ============================================
+// DRAW LIVES
+// ============================================
 
 function drawLives() {
   ctx.save();
@@ -724,35 +976,42 @@ function drawLives() {
   ctx.restore();
 }
 
-// SPEL STARTEN
+// ============================================
+// START GAME
+// ============================================
 
 async function start() {
   if (gameRunning || startingGame) return;
 
   startingGame = true;
 
+  startGameMusic();
+
   try {
-    playerName = (n.value.trim() || "SPELER")
+    playerName = (n.value.trim() || "PLAYER")
       .replace(/[^a-zA-Z0-9_-]/g, "")
       .slice(0, 10)
-      .toUpperCase() || "SPELER";
+      .toUpperCase() || "PLAYER";
 
     n.value = playerName;
     safeSet("flappy_name", playerName);
 
-    setStatus("Spel controleren...");
+    setStatus("Checking game...");
 
-    // Iedere spelronde krijgt een unieke server-run.
     const runResult = await gameRequest("start-run", {
       playerId,
       playerName
     });
 
     if (!runResult || !runResult.runId) {
-      throw new Error("De server kon geen spelronde starten.");
+      throw new Error("The server could not start a game round.");
     }
 
     currentRunId = runResult.runId;
+
+    // Prepare a new replay.
+    resetReplayRecording();
+
     gameRunning = true;
 
     bird = {
@@ -780,26 +1039,37 @@ async function start() {
     t.style.color = "#facc15";
 
     fs.classList.add("hidden");
-    btn.textContent = "SPEEL NU";
+    btn.textContent = "PLAY AGAIN";
 
     ui.classList.add("hidden");
 
-    setStatus("Veel plezier met spelen!");
+    setStatus("Have fun playing!");
+
+    // Save the starting position.
+    captureReplayFrame(true);
+
     cancelAnimationFrame(animId);
     loop();
 
   } catch (error) {
     gameRunning = false;
     currentRunId = null;
-    console.error("Spel starten mislukt:", error);
+    replayRecording = false;
+    gameMusic.pause();
+
+    console.error("Game start failed:", error);
+
     ui.classList.remove("hidden");
-    setStatus(error.message || "Spel starten mislukt.");
+    setStatus(error.message || "Game could not start.");
+
   } finally {
     startingGame = false;
   }
 }
 
-// SPEELKNOP
+// ============================================
+// PLAY BUTTON
+// ============================================
 
 let lastStartInput = 0;
 
@@ -820,22 +1090,46 @@ function startFromButton(event) {
 btn.addEventListener("pointerup", startFromButton);
 btn.addEventListener("click", startFromButton);
 
-// VOGEL LATEN VLIEGEN
+// ============================================
+// BIRD FLAP
+// ============================================
 
 function flap(event) {
   if (event) event.preventDefault();
 
   if (!over && bird && !respawning) {
     bird.v = bird.j;
+
+    recordReplayEvent({
+      type: "jump",
+      y: Math.round(bird.y * 100) / 100,
+      score,
+      lives
+    });
+
+    // Save an exact frame for every jump.
+    captureReplayFrame(true);
   }
 }
 
-// LEVEN VERLIEZEN
+// ============================================
+// LOSE LIFE
+// ============================================
 
-function loseLife() {
+function loseLife(cause = "unknown") {
   if (over || invulnerable || respawning) return;
 
+  const livesBefore = lives;
+
   lives--;
+
+  recordReplayEvent({
+    type: "collision",
+    cause,
+    livesBefore,
+    livesAfter: lives,
+    score
+  });
 
   if (lives <= 0) {
     lives = 0;
@@ -843,56 +1137,73 @@ function loseLife() {
     return;
   }
 
-  // Vogel opnieuw positioneren
+  // Reset the bird position.
   bird.y = 250;
   bird.v = 0;
 
-  // Korte bescherming na respawn
+  // Temporary protection after respawning.
   invulnerable = true;
   invulnerableTimer = 100;
   respawning = true;
   respawnTimer = 35;
 
-  // Obstakels rond de speler verwijderen
+  // Remove nearby obstacles.
   pipes = pipes.filter(p => p.x > bird.x + 100);
 
-  console.log("Leven verloren. Over:", lives);
+  captureReplayFrame(true);
+
+  console.log("Life lost. Remaining lives:", lives);
 }
 
+// ============================================
 // GAME OVER
+// ============================================
 
 function die() {
   if (over) return;
 
   over = true;
   gameRunning = false;
+  gameMusic.pause();
+  gameMusic.currentTime = 0;
+
+  recordReplayEvent({
+    type: "game_over",
+    score,
+    lives
+  });
+
+  // Save the final game state.
+  captureReplayFrame(true);
 
   t.textContent = "GAME OVER";
   t.style.color = "#ef4444";
 
   fs.textContent =
-    playerName + " - Score: " + score + " - Levens: " + lives;
+    playerName + " - Score: " + score + " - Lives: " + lives;
 
   fs.classList.remove("hidden");
 
-  btn.textContent = "OPNIEUW SPELEN";
+  btn.textContent = "PLAY AGAIN";
   ui.classList.remove("hidden");
 
   if (!scoreSaved) {
     scoreSaved = true;
-    setStatus("Score online opslaan...");
+    setStatus("Saving score and replay online...");
     saveScore(playerName, score);
   }
 }
 
+// ============================================
 // GAME LOOP
+// ============================================
 
 function loop() {
   if (over) return;
 
   ctx.clearRect(0, 0, 400, 560);
 
-  // Respawn-timer
+  // Respawn timer.
   if (respawning) {
     respawnTimer--;
 
@@ -901,7 +1212,7 @@ function loop() {
     }
   }
 
-  // Beschermingstimer
+  // Invulnerability timer.
   if (invulnerable) {
     invulnerableTimer--;
 
@@ -910,13 +1221,13 @@ function loop() {
     }
   }
 
-  // Vogel bewegen
+  // Move bird.
   if (!respawning) {
     bird.v += bird.g;
     bird.y += bird.v;
   }
 
-  // Obstakels maken
+  // Create obstacles.
   if (fc % 95 === 0) {
     const gap = 130;
 
@@ -942,7 +1253,7 @@ function loop() {
     ctx.fillRect(p.x, 0, p.w, p.top);
     ctx.fillRect(p.x, p.bot, p.w, 560 - p.bot);
 
-    // Botsing met obstakel
+    // Obstacle collision.
     if (
       !invulnerable &&
       !respawning &&
@@ -953,13 +1264,20 @@ function loop() {
         bird.y + bird.r > p.bot
       )
     ) {
-      loseLife();
+      loseLife("pipe");
       break;
     }
 
     if (!p.passed && p.x + p.w < bird.x) {
       p.passed = true;
       score++;
+
+      recordReplayEvent({
+        type: "score",
+        score
+      });
+
+      captureReplayFrame(true);
     }
 
     if (p.x + p.w < 0) {
@@ -969,25 +1287,25 @@ function loop() {
 
   if (over) return;
 
-  // Botsing met boven- of onderkant
+  // Top and bottom boundary collision.
   if (
     !invulnerable &&
     !respawning &&
     (bird.y + bird.r > 560 || bird.y - bird.r < 0)
   ) {
-    loseLife();
+    loseLife("boundary");
   }
 
   if (over) return;
 
-  // Vogel tekenen
+  // Draw bird.
   if (!invulnerable || Math.floor(fc / 5) % 2 === 0) {
     ctx.fillStyle = "#facc15";
     ctx.beginPath();
     ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
     ctx.fill();
 
-    // Oog
+    // Eye.
     ctx.fillStyle = "#fff";
     ctx.beginPath();
     ctx.arc(bird.x + 5, bird.y - 4, 4, 0, Math.PI * 2);
@@ -999,35 +1317,42 @@ function loop() {
     ctx.fill();
   }
 
-  // Score
+  // Draw score.
   ctx.fillStyle = "#fff";
   ctx.font = "bold 26px monospace";
   ctx.textAlign = "center";
   ctx.fillText(score, 200, 45);
 
-  // Levens
   drawLives();
 
-  // Respawnmelding
+  // Respawn message.
   if (respawning) {
     ctx.fillStyle = "#38bdf8";
     ctx.font = "bold 18px monospace";
     ctx.textAlign = "center";
-    ctx.fillText("KLAAR OM VERDER TE VLIEGEN!", 200, 300);
+    ctx.fillText("READY TO FLY AGAIN!", 200, 300);
   }
 
   fc++;
+
+  // Periodic replay snapshot.
+  captureReplayFrame(false);
+
   animId = requestAnimationFrame(loop);
 }
 
-// MOBIELE BEDIENING
+// ============================================
+// MOBILE CONTROLS
+// ============================================
 
 c.addEventListener("pointerdown", function(event) {
   event.preventDefault();
   flap();
 }, { passive: false });
 
-// TOETSENBORD
+// ============================================
+// KEYBOARD CONTROLS
+// ============================================
 
 document.addEventListener("keydown", function(event) {
   if (
@@ -1060,7 +1385,9 @@ document.addEventListener("keydown", function(event) {
   }
 });
 
-// ADMINPANEEL OPENEN
+// ============================================
+// ADMIN PANEL
+// ============================================
 
 function openAdminPanel() {
   adminPanel.classList.remove("hidden");
@@ -1072,13 +1399,16 @@ function openAdminPanel() {
 
 function closeAdminPanel() {
   adminPanel.classList.add("hidden");
+  stopReplayPlayback();
 }
 
-// ADMINVERZOEK
+// ============================================
+// ADMIN REQUEST
+// ============================================
 
 async function adminRequest(action, extra = {}) {
   if (!db) {
-    throw new Error("Supabase niet beschikbaar.");
+    throw new Error("Supabase is unavailable.");
   }
 
   const { data, error } = await db.functions.invoke("admin-boas", {
@@ -1091,49 +1421,51 @@ async function adminRequest(action, extra = {}) {
 
   if (error) {
     let details = "";
-    let httpStatus = "onbekend";
+    let httpStatus = "unknown";
 
     try {
       if (error.context) {
-        httpStatus = error.context.status || "onbekend";
+        httpStatus = error.context.status || "unknown";
 
         if (typeof error.context.clone === "function") {
           details = await error.context.clone().text();
         }
       }
     } catch (readError) {
-      console.error("Foutdetails lezen mislukt:", readError);
+      console.error("Could not read error details:", readError);
     }
 
-    console.error("Admin HTTP-status:", httpStatus);
-    console.error("Admin serverantwoord:", details);
-    console.error("Volledige adminfout:", error);
+    console.error("Admin HTTP status:", httpStatus);
+    console.error("Admin server response:", details);
+    console.error("Full admin error:", error);
 
     throw new Error(
-      "Adminfunctie fout " + httpStatus + ": " +
+      "Admin function error " + httpStatus + ": " +
       (details || error.message)
     );
   }
 
   if (!data || data.error || data.success === false) {
-    throw new Error(data?.error || "Adminactie mislukt.");
+    throw new Error(data?.error || "Admin action failed.");
   }
 
   return data;
 }
 
-// ADMIN INLOGGEN
+// ============================================
+// ADMIN LOGIN
+// ============================================
 
 document.getElementById("adminLoginButton")
   .addEventListener("click", async () => {
     const enteredCode = adminCodeInput.value;
 
     if (!enteredCode) {
-      adminStatus.textContent = "Vul je admincode in.";
+      adminStatus.textContent = "Enter your admin code.";
       return;
     }
 
-    adminStatus.textContent = "Controleren...";
+    adminStatus.textContent = "Checking...";
 
     try {
       adminCode = enteredCode;
@@ -1144,10 +1476,11 @@ document.getElementById("adminLoginButton")
       adminLogin.classList.add("hidden");
       adminContent.classList.remove("hidden");
 
-      adminStatus.textContent = "Succesvol ingelogd.";
+      adminStatus.textContent = "Successfully logged in.";
 
       await refreshAdminScores();
       await refreshAdminBans();
+      await refreshAdminReplays();
 
     } catch (error) {
       adminCode = "";
@@ -1156,19 +1489,21 @@ document.getElementById("adminLoginButton")
     }
   });
 
-// ADMIN SCORES LADEN
+// ============================================
+// ADMIN SCORES
+// ============================================
 
 async function refreshAdminScores() {
   if (!adminLoggedIn) return;
 
-  adminStatus.textContent = "Scores ophalen...";
+  adminStatus.textContent = "Loading scores...";
 
   try {
     const result = await adminRequest("list-scores");
     adminScores.innerHTML = "";
 
     if (!result.scores || result.scores.length === 0) {
-      adminScores.textContent = "Geen scores gevonden.";
+      adminScores.textContent = "No scores found.";
     }
 
     (result.scores || []).forEach(item => {
@@ -1181,13 +1516,13 @@ async function refreshAdminScores() {
 
       const edit = document.createElement("button");
       edit.className = "blue";
-      edit.textContent = "AANPASSEN";
+      edit.textContent = "EDIT";
 
       edit.addEventListener("click", async () => {
-        const newName = prompt("Nieuwe naam:", item.name);
+        const newName = prompt("New name:", item.name);
         if (newName === null) return;
 
-        const newScore = prompt("Nieuwe score:", item.score);
+        const newScore = prompt("New score:", item.score);
         if (newScore === null) return;
 
         try {
@@ -1197,7 +1532,7 @@ async function refreshAdminScores() {
             score: newScore
           });
 
-          adminStatus.textContent = "Score aangepast.";
+          adminStatus.textContent = "Score updated.";
           await refreshAdminScores();
           await loadLeaderboard();
 
@@ -1208,17 +1543,17 @@ async function refreshAdminScores() {
 
       const remove = document.createElement("button");
       remove.className = "danger";
-      remove.textContent = "VERWIJDEREN";
+      remove.textContent = "DELETE";
 
       remove.addEventListener("click", async () => {
-        if (!confirm("Deze score verwijderen?")) return;
+        if (!confirm("Delete this score?")) return;
 
         try {
           await adminRequest("delete-score", {
             id: String(item.id)
           });
 
-          adminStatus.textContent = "Score verwijderd.";
+          adminStatus.textContent = "Score deleted.";
           await refreshAdminScores();
           await loadLeaderboard();
 
@@ -1233,19 +1568,22 @@ async function refreshAdminScores() {
       adminScores.appendChild(row);
     });
 
-    adminStatus.textContent = "Scores geladen.";
+    adminStatus.textContent = "Scores loaded.";
 
   } catch (error) {
     adminStatus.textContent = error.message;
   }
 }
 
-// BANLIJST LADEN
+// ============================================
+// BAN LIST
+// ============================================
 
 function formatBanExpiry(expiresAt) {
   if (!expiresAt) return "Permanent";
+
   const date = new Date(expiresAt);
-  return "Tot " + date.toLocaleString("nl-BE");
+  return "Until " + date.toLocaleString("en-GB");
 }
 
 async function refreshAdminBans() {
@@ -1259,7 +1597,7 @@ async function refreshAdminBans() {
       kind: "player",
       id: item.id,
       label: item.player_name || item.player_id,
-      detail: "Speler-ID: " + item.player_id,
+      detail: "Player ID: " + item.player_id,
       reason: item.reason,
       expiresAt: item.expires_at
     }));
@@ -1268,7 +1606,7 @@ async function refreshAdminBans() {
       kind: "name",
       id: item.id,
       label: item.player_name,
-      detail: "Ban op spelersnaam",
+      detail: "Player name ban",
       reason: item.reason,
       expiresAt: item.expires_at
     }));
@@ -1276,7 +1614,7 @@ async function refreshAdminBans() {
     const allBans = [...nameBans, ...playerBans];
 
     if (allBans.length === 0) {
-      adminBans.textContent = "Geen actieve bans.";
+      adminBans.textContent = "No active bans.";
       return;
     }
 
@@ -1288,14 +1626,14 @@ async function refreshAdminBans() {
       info.textContent =
         item.label + " — " + item.detail +
         " — " + formatBanExpiry(item.expiresAt) +
-        (item.reason ? " — Reden: " + item.reason : "");
+        (item.reason ? " — Reason: " + item.reason : "");
 
       const remove = document.createElement("button");
       remove.className = "danger";
-      remove.textContent = "UNBANNEN";
+      remove.textContent = "UNBAN";
 
       remove.addEventListener("click", async () => {
-        if (!confirm("Ban van " + item.label + " verwijderen?")) return;
+        if (!confirm("Remove the ban for " + item.label + "?")) return;
 
         try {
           if (item.kind === "name") {
@@ -1303,13 +1641,20 @@ async function refreshAdminBans() {
               playerName: item.label
             });
           } else {
+            const matchingBan = (result.bans || []).find(x => x.id === item.id);
+
+            if (!matchingBan) {
+              throw new Error("Could not find this player ban.");
+            }
+
             await adminRequest("unban-player", {
-              playerId: (result.bans || []).find(x => x.id === item.id).player_id
+              playerId: matchingBan.player_id
             });
           }
 
-          adminStatus.textContent = "Ban verwijderd.";
+          adminStatus.textContent = "Ban removed.";
           await refreshAdminBans();
+
         } catch (error) {
           adminStatus.textContent = error.message;
         }
@@ -1320,21 +1665,26 @@ async function refreshAdminBans() {
       adminBans.appendChild(row);
     });
 
-    adminStatus.textContent = "Banlijst geladen.";
+    adminStatus.textContent = "Ban list loaded.";
+
   } catch (error) {
-    adminBans.textContent = "Banlijst laden mislukt: " + error.message;
+    adminBans.textContent = "Could not load bans: " + error.message;
     adminStatus.textContent = error.message;
   }
 }
 
-// AANGEPASTE BANPERIODE TONEN
+// ============================================
+// CUSTOM BAN DURATION
+// ============================================
 
 document.getElementById("banDuration").addEventListener("change", event => {
   document.getElementById("customBanFields")
     .classList.toggle("hidden", event.target.value !== "custom");
 });
 
-// NAAM BANNEN
+// ============================================
+// BAN PLAYER BY NAME
+// ============================================
 
 document.getElementById("banNameButton").addEventListener("click", async () => {
   const playerNameToBan = document.getElementById("banName").value
@@ -1346,11 +1696,11 @@ document.getElementById("banNameButton").addEventListener("click", async () => {
   const reason = document.getElementById("banReason").value;
 
   if (!playerNameToBan) {
-    adminStatus.textContent = "Vul een geldige spelersnaam in.";
+    adminStatus.textContent = "Enter a valid player name.";
     return;
   }
 
-  let permanent = durationChoice === "permanent";
+  const permanent = durationChoice === "permanent";
   let durationMinutes = null;
 
   if (!permanent && durationChoice === "custom") {
@@ -1358,7 +1708,7 @@ document.getElementById("banNameButton").addEventListener("click", async () => {
     const unit = document.getElementById("customBanUnit").value;
 
     if (!Number.isInteger(amount) || amount < 1) {
-      adminStatus.textContent = "Vul een geldige aangepaste duur in.";
+      adminStatus.textContent = "Enter a valid custom duration.";
       return;
     }
 
@@ -1368,20 +1718,21 @@ document.getElementById("banNameButton").addEventListener("click", async () => {
     durationMinutes = amount * multiplier;
 
     if (durationMinutes > 525600) {
-      adminStatus.textContent = "De maximale banperiode is 365 dagen.";
+      adminStatus.textContent = "The maximum ban duration is 365 days.";
       return;
     }
+
   } else if (!permanent) {
     durationMinutes = Number(durationChoice);
   }
 
   if (!confirm(
-    "Spelersnaam " + playerNameToBan + " bannen" +
-    (permanent ? " (permanent)?" : " voor " + durationMinutes + " minuten?")
+    "Ban player " + playerNameToBan +
+    (permanent ? " permanently?" : " for " + durationMinutes + " minutes?")
   )) return;
 
   try {
-    adminStatus.textContent = "Ban instellen...";
+    adminStatus.textContent = "Setting ban...";
 
     await adminRequest("ban-name", {
       playerName: playerNameToBan,
@@ -1392,20 +1743,26 @@ document.getElementById("banNameButton").addEventListener("click", async () => {
 
     document.getElementById("banName").value = "";
     document.getElementById("banReason").value = "";
-    adminStatus.textContent = playerNameToBan + " is geband.";
+
+    adminStatus.textContent = playerNameToBan + " has been banned.";
 
     await refreshAdminBans();
+
   } catch (error) {
-    adminStatus.textContent = "Bannen mislukt: " + error.message;
+    adminStatus.textContent = "Ban failed: " + error.message;
   }
 });
 
-// BANLIJST VERVERSEN
+// ============================================
+// REFRESH BAN LIST
+// ============================================
 
 document.getElementById("refreshBansButton")
   .addEventListener("click", refreshAdminBans);
 
-// SCORE TOEVOEGEN
+// ============================================
+// ADD SCORE
+// ============================================
 
 document.getElementById("addScoreButton")
   .addEventListener("click", async () => {
@@ -1413,7 +1770,7 @@ document.getElementById("addScoreButton")
     const scoreValue = document.getElementById("newScore").value;
 
     if (!name.trim() || scoreValue === "") {
-      adminStatus.textContent = "Vul naam en score in.";
+      adminStatus.textContent = "Enter a name and score.";
       return;
     }
 
@@ -1426,7 +1783,7 @@ document.getElementById("addScoreButton")
       document.getElementById("newName").value = "";
       document.getElementById("newScore").value = "";
 
-      adminStatus.textContent = "Score toegevoegd.";
+      adminStatus.textContent = "Score added.";
 
       await refreshAdminScores();
       await loadLeaderboard();
@@ -1436,18 +1793,423 @@ document.getElementById("addScoreButton")
     }
   });
 
-// SCORES VERVERSEN
+// ============================================
+// REFRESH SCORES
+// ============================================
 
 document.getElementById("refreshScoresButton")
   .addEventListener("click", refreshAdminScores);
 
-// ADMIN UITLOGGEN
+// ============================================
+// REPLAY CENTER - LOAD REPLAY LIST
+// ============================================
+
+let currentReplay = null;
+let currentReplayIndex = 0;
+let replayInterval = null;
+let currentReplayJumpIndex = -1;
+
+function stopReplayPlayback() {
+  if (replayInterval) {
+    clearInterval(replayInterval);
+    replayInterval = null;
+  }
+}
+
+async function refreshAdminReplays() {
+  if (!adminLoggedIn) return;
+
+  adminReplays.textContent = "Loading replays...";
+
+  try {
+    const result = await adminRequest("list-replays");
+    const replays = result.replays || [];
+
+    adminReplays.innerHTML = "";
+
+    if (replays.length === 0) {
+      adminReplays.textContent = "No replays found yet.";
+      return;
+    }
+
+    replays.forEach(replay => {
+      const row = document.createElement("div");
+      row.className = "admin-row";
+
+      const info = document.createElement("p");
+
+      const dateText = replay.created_at
+        ? new Date(replay.created_at).toLocaleString("en-GB")
+        : "Unknown date";
+
+      info.textContent =
+        "Player ID: " + replay.player_id +
+        " | Score: " + (replay.score ?? "Not listed") +
+        " | Jumps: " + replay.jump_count +
+        " | " + dateText;
+
+      const viewButton = document.createElement("button");
+      viewButton.className = "blue";
+      viewButton.textContent = "VIEW REPLAY";
+
+      viewButton.addEventListener("click", () => {
+        loadAdminReplay(replay.run_id);
+      });
+
+      row.appendChild(info);
+      row.appendChild(viewButton);
+      adminReplays.appendChild(row);
+    });
+
+    adminStatus.textContent = "Replays loaded.";
+
+  } catch (error) {
+    adminReplays.textContent = "Could not load replays: " + error.message;
+    adminStatus.textContent = error.message;
+  }
+}
+
+// ============================================
+// LOAD A SINGLE REPLAY
+// ============================================
+
+async function loadAdminReplay(runId) {
+  if (!adminLoggedIn) return;
+
+  stopReplayPlayback();
+
+  adminStatus.textContent = "Loading replay...";
+
+  try {
+    const result = await adminRequest("get-replay", {
+      runId
+    });
+
+    const replay = result.replay || result;
+
+    if (!replay || !Array.isArray(replay.keyframes)) {
+      throw new Error("The replay data is missing or invalid.");
+    }
+
+    currentReplay = replay;
+    currentReplayIndex = 0;
+    currentReplayJumpIndex = -1;
+
+    const events = Array.isArray(replay.events) ? replay.events : [];
+    const jumps = events.filter(event => event.type === "jump");
+
+    replaySelectedInfo.textContent =
+      "Run: " + runId +
+      " | Total ticks: " + replay.duration_ticks +
+      " | Recorded jumps: " + jumps.length;
+
+    replaySlider.disabled = false;
+    replaySlider.min = "0";
+    replaySlider.max = String(Math.max(0, replay.keyframes.length - 1));
+    replaySlider.value = "0";
+
+    document.getElementById("replayPlayButton").disabled = false;
+    document.getElementById("replayPauseButton").disabled = false;
+    document.getElementById("replayPreviousJump").disabled = jumps.length === 0;
+    document.getElementById("replayNextJump").disabled = jumps.length === 0;
+
+    renderReplayFrame(0);
+    renderReplayJumpList();
+
+    adminStatus.textContent = "Replay loaded successfully.";
+
+  } catch (error) {
+    console.error("Replay loading failed:", error);
+    adminStatus.textContent = "Could not load replay: " + error.message;
+  }
+}
+
+// ============================================
+// DRAW REPLAY FRAME
+// ============================================
+
+function renderReplayFrame(index) {
+  if (!currentReplay || !Array.isArray(currentReplay.keyframes)) return;
+
+  const frames = currentReplay.keyframes;
+
+  if (frames.length === 0) return;
+
+  currentReplayIndex = Math.max(0, Math.min(index, frames.length - 1));
+
+  const frame = frames[currentReplayIndex];
+
+  replayCtx.clearRect(0, 0, 400, 560);
+
+  // Background.
+  replayCtx.fillStyle = "#0f172a";
+  replayCtx.fillRect(0, 0, 400, 560);
+
+  // Obstacles.
+  replayCtx.fillStyle = "#22c55e";
+
+  (frame.pipes || []).forEach(pipe => {
+    replayCtx.fillRect(pipe.x, 0, pipe.w || 52, pipe.top);
+    replayCtx.fillRect(
+      pipe.x,
+      pipe.bot,
+      pipe.w || 52,
+      560 - pipe.bot
+    );
+  });
+
+  // Bird.
+  const birdX = Number(frame.x ?? 90);
+  const birdY = Number(frame.y ?? 250);
+
+  replayCtx.fillStyle = "#facc15";
+  replayCtx.beginPath();
+  replayCtx.arc(birdX, birdY, 14, 0, Math.PI * 2);
+  replayCtx.fill();
+
+  // Bird eye.
+  replayCtx.fillStyle = "#fff";
+  replayCtx.beginPath();
+  replayCtx.arc(birdX + 5, birdY - 4, 4, 0, Math.PI * 2);
+  replayCtx.fill();
+
+  replayCtx.fillStyle = "#020617";
+  replayCtx.beginPath();
+  replayCtx.arc(birdX + 6, birdY - 4, 2, 0, Math.PI * 2);
+  replayCtx.fill();
+
+  // Score.
+  replayCtx.fillStyle = "#fff";
+  replayCtx.font = "bold 26px monospace";
+  replayCtx.textAlign = "center";
+  replayCtx.fillText(String(frame.score ?? 0), 200, 45);
+
+  // Lives.
+  replayCtx.font = "bold 22px monospace";
+  replayCtx.textAlign = "left";
+  replayCtx.fillStyle = "#ef4444";
+
+  let hearts = "";
+
+  for (let i = 0; i < 3; i++) {
+    hearts += i < (frame.lives ?? 3) ? "♥ " : "♡ ";
+  }
+
+  replayCtx.fillText(hearts, 12, 38);
+
+  // Respawn indicator.
+  if (frame.resp) {
+    replayCtx.fillStyle = "#38bdf8";
+    replayCtx.font = "bold 18px monospace";
+    replayCtx.textAlign = "center";
+    replayCtx.fillText("RESPAWNING", 200, 300);
+  }
+
+  // Replay information.
+  replayFrameInfo.textContent =
+    "Frame " + (currentReplayIndex + 1) + "/" + frames.length +
+    " | Tick: " + frame.tick +
+    " | Score: " + (frame.score ?? 0) +
+    " | Lives: " + (frame.lives ?? 0);
+
+  replaySlider.value = String(currentReplayIndex);
+}
+
+// ============================================
+// REPLAY PLAYBACK
+// ============================================
+
+function playReplay() {
+  if (!currentReplay || !currentReplay.keyframes.length) return;
+
+  stopReplayPlayback();
+
+  if (currentReplayIndex >= currentReplay.keyframes.length - 1) {
+    renderReplayFrame(0);
+  }
+
+  replayInterval = setInterval(() => {
+    if (!currentReplay) {
+      stopReplayPlayback();
+      return;
+    }
+
+    if (currentReplayIndex >= currentReplay.keyframes.length - 1) {
+      stopReplayPlayback();
+      return;
+    }
+
+    renderReplayFrame(currentReplayIndex + 1);
+  }, 100);
+}
+
+document.getElementById("replayPlayButton")
+  .addEventListener("click", playReplay);
+
+document.getElementById("replayPauseButton")
+  .addEventListener("click", stopReplayPlayback);
+
+// ============================================
+// REPLAY SLIDER
+// ============================================
+
+replaySlider.addEventListener("input", () => {
+  stopReplayPlayback();
+  renderReplayFrame(Number(replaySlider.value));
+});
+
+// ============================================
+// JUMP ANALYSIS LIST
+// ============================================
+
+function renderReplayJumpList() {
+  replayJumps.innerHTML = "";
+
+  if (!currentReplay) {
+    replayJumps.textContent = "No replay selected.";
+    return;
+  }
+
+  const events = Array.isArray(currentReplay.events)
+    ? currentReplay.events
+    : [];
+
+  const jumps = events.filter(event => event.type === "jump");
+
+  if (jumps.length === 0) {
+    replayJumps.textContent = "No jumps were recorded.";
+    return;
+  }
+
+  jumps.forEach((jump, index) => {
+    const row = document.createElement("div");
+    row.className = "jump-row";
+
+    const info = document.createElement("span");
+
+    const seconds = (Number(jump.tick || 0) / 60).toFixed(2);
+
+    info.textContent =
+      "Jump " + (index + 1) +
+      " | Tick: " + jump.tick +
+      " | Approx. time: " + seconds + "s" +
+      " | Score: " + (jump.score ?? 0) +
+      " | Bird Y: " + (jump.y ?? "?");
+
+    const button = document.createElement("button");
+    button.className = "blue";
+    button.textContent = "VIEW";
+
+    button.addEventListener("click", () => {
+      stopReplayPlayback();
+
+      currentReplayJumpIndex = index;
+
+      const matchingFrameIndex = currentReplay.keyframes.findIndex(frame =>
+        Number(frame.tick) === Number(jump.tick)
+      );
+
+      if (matchingFrameIndex >= 0) {
+        renderReplayFrame(matchingFrameIndex);
+      } else {
+        const nearestIndex = findNearestReplayFrame(jump.tick);
+        renderReplayFrame(nearestIndex);
+      }
+    });
+
+    row.appendChild(info);
+    row.appendChild(button);
+    replayJumps.appendChild(row);
+  });
+}
+
+// ============================================
+// FIND NEAREST REPLAY FRAME
+// ============================================
+
+function findNearestReplayFrame(tick) {
+  if (!currentReplay || !currentReplay.keyframes.length) return 0;
+
+  let bestIndex = 0;
+  let bestDifference = Infinity;
+
+  currentReplay.keyframes.forEach((frame, index) => {
+    const difference = Math.abs(Number(frame.tick) - Number(tick));
+
+    if (difference < bestDifference) {
+      bestDifference = difference;
+      bestIndex = index;
+    }
+  });
+
+  return bestIndex;
+}
+
+// ============================================
+// PREVIOUS AND NEXT JUMP
+// ============================================
+
+function jumpToReplayEvent(direction) {
+  if (!currentReplay) return;
+
+  const events = Array.isArray(currentReplay.events)
+    ? currentReplay.events
+    : [];
+
+  const jumps = events.filter(event => event.type === "jump");
+
+  if (jumps.length === 0) return;
+
+  if (currentReplayJumpIndex < 0) {
+    currentReplayJumpIndex = 0;
+  } else {
+    currentReplayJumpIndex += direction;
+  }
+
+  currentReplayJumpIndex = Math.max(
+    0,
+    Math.min(jumps.length - 1, currentReplayJumpIndex)
+  );
+
+  const jump = jumps[currentReplayJumpIndex];
+  const frameIndex = findNearestReplayFrame(jump.tick);
+
+  stopReplayPlayback();
+  renderReplayFrame(frameIndex);
+}
+
+document.getElementById("replayPreviousJump")
+  .addEventListener("click", () => jumpToReplayEvent(-1));
+
+document.getElementById("replayNextJump")
+  .addEventListener("click", () => jumpToReplayEvent(1));
+
+// ============================================
+// REFRESH REPLAYS
+// ============================================
+
+document.getElementById("refreshReplaysButton")
+  .addEventListener("click", refreshAdminReplays);
+
+// ============================================
+// ADMIN LOGOUT
+// ============================================
 
 document.getElementById("adminLogoutButton")
   .addEventListener("click", () => {
+    stopReplayPlayback();
+
     adminCode = "";
     adminLoggedIn = false;
+
     adminBans.innerHTML = "";
+    adminScores.innerHTML = "";
+    adminReplays.innerHTML = "";
+
+    currentReplay = null;
+    replayJumps.textContent = "Select a replay to view its jumps.";
+    replaySelectedInfo.textContent = "Select a replay to start viewing.";
+    replayFrameInfo.textContent = "No replay selected.";
 
     adminLogin.classList.remove("hidden");
     adminContent.classList.add("hidden");
@@ -1455,22 +2217,28 @@ document.getElementById("adminLogoutButton")
     adminPanel.classList.add("hidden");
   });
 
-// ADMIN SLUITEN
+// ============================================
+// CLOSE ADMIN PANEL
+// ============================================
 
 document.getElementById("adminCloseLogin")
   .addEventListener("click", closeAdminPanel);
 
-// FOUTEN
+// ============================================
+// ERROR HANDLING
+// ============================================
 
 window.addEventListener("error", function(event) {
-  console.error("JavaScript fout:", event.message);
+  console.error("JavaScript error:", event.message);
 });
 
 window.addEventListener("unhandledrejection", function(event) {
-  console.error("Onverwachte fout:", event.reason);
+  console.error("Unhandled promise rejection:", event.reason);
 });
 
-// START
+// ============================================
+// INITIALIZE
+// ============================================
 
 updateMusicButton();
 loadLeaderboard();
