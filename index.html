@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -220,143 +221,6 @@ li {
   from { transform: scale(1); }
   to { transform: scale(1.06); }
 }
-
-#adminPanel {
-  position: absolute;
-  inset: 0;
-  z-index: 50;
-  background: #020617;
-  padding: 14px;
-  overflow-y: auto;
-  text-align: center;
-}
-
-#adminPanel h2 {
-  color: #38bdf8;
-  margin: 12px 0;
-}
-
-#adminPanel input,
-#adminPanel select {
-  margin: 5px;
-  width: 90%;
-  padding: 10px;
-  text-align: center;
-  background: #1e293b;
-  color: white;
-  border: 2px solid #38bdf8;
-  border-radius: 6px;
-  font-size: 15px;
-}
-
-.admin-actions {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 10px 0;
-}
-
-.admin-actions button {
-  padding: 9px 12px;
-  font-size: 12px;
-}
-
-.admin-row {
-  border: 1px solid #334155;
-  border-radius: 6px;
-  padding: 8px;
-  margin: 7px 0;
-  overflow-wrap: anywhere;
-}
-
-.admin-row button {
-  margin: 5px 3px 0;
-  padding: 7px 10px;
-  font-size: 11px;
-}
-
-#adminStatus {
-  font-size: 12px;
-  color: #facc15;
-  margin: 10px;
-  overflow-wrap: anywhere;
-}
-
-.danger {
-  background: #ef4444;
-  color: white;
-}
-
-.blue {
-  background: #38bdf8;
-}
-
-.replay-section {
-  border: 1px solid #334155;
-  border-radius: 8px;
-  padding: 10px;
-  margin-top: 18px;
-}
-
-.replay-section h3 {
-  color: #a78bfa;
-  margin: 10px 0;
-}
-
-#replayCanvas {
-  width: min(300px, 100%);
-  height: auto;
-  aspect-ratio: 5 / 7;
-  border: 2px solid #38bdf8;
-  border-radius: 8px;
-  background: #0f172a;
-  margin: 10px auto;
-  touch-action: auto;
-}
-
-#replaySlider {
-  width: 95%;
-  margin: 10px 0;
-  accent-color: #38bdf8;
-}
-
-.replay-info {
-  color: #94a3b8;
-  font-size: 11px;
-  overflow-wrap: anywhere;
-  margin: 6px;
-}
-
-.replay-controls {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px;
-  margin: 8px 0;
-}
-
-.replay-controls button {
-  padding: 8px 10px;
-  font-size: 11px;
-}
-
-.jump-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  border-bottom: 1px solid #334155;
-  padding: 7px 3px;
-  font-size: 11px;
-  text-align: left;
-}
-
-.jump-row button {
-  padding: 6px 9px;
-  font-size: 10px;
-  flex-shrink: 0;
-}
 </style>
 </head>
 
@@ -397,117 +261,6 @@ li {
     <p id="status">Loading online leaderboard...</p>
 
     <button id="btn" type="button">PLAY NOW</button>
-  </div>
-
-  <div id="adminPanel" class="hidden">
-    <h2>FLAPPY ARCADE ADMIN</h2>
-    <p style="color:#94a3b8;font-size:11px">Open with Ctrl + Alt + E · Close with Escape</p>
-
-    <section id="adminLogin">
-      <p>Enter your admin code</p>
-      <input id="adminCodeInput" type="password" placeholder="ADMIN CODE" autocomplete="off">
-
-      <div class="admin-actions">
-        <button id="adminLoginButton" type="button">LOG IN</button>
-        <button id="adminCloseLogin" class="danger" type="button">CLOSE</button>
-      </div>
-    </section>
-
-    <section id="adminContent" class="hidden">
-
-      <h3 style="color:#facc15">ADD SCORE</h3>
-
-      <input id="newName" maxlength="10" placeholder="PLAYER NAME">
-      <input id="newScore" type="number" min="0" max="999999" placeholder="SCORE">
-
-      <div class="admin-actions">
-        <button id="addScoreButton" type="button">ADD SCORE</button>
-        <button id="refreshScoresButton" class="blue" type="button">REFRESH SCORES</button>
-        <button id="adminLogoutButton" class="danger" type="button">LOG OUT</button>
-      </div>
-
-      <h3 style="color:#38bdf8">EXISTING SCORES</h3>
-      <div id="adminScores"></div>
-
-      <hr style="border:1px solid #334155;margin:18px 0">
-
-      <h3 style="color:#ef4444">BAN PLAYER BY NAME</h3>
-
-      <input id="banName" maxlength="10" placeholder="PLAYER NAME">
-
-      <select id="banDuration">
-        <option value="10">10 minutes</option>
-        <option value="60">1 hour</option>
-        <option value="1440">24 hours</option>
-        <option value="10080">7 days</option>
-        <option value="43200">30 days</option>
-        <option value="custom">Custom duration</option>
-        <option value="permanent">Permanent</option>
-      </select>
-
-      <div id="customBanFields" class="hidden">
-        <input id="customBanAmount" type="number" min="1" max="365" placeholder="Amount">
-        <select id="customBanUnit">
-          <option value="minutes">Minutes</option>
-          <option value="hours">Hours</option>
-          <option value="days">Days</option>
-        </select>
-      </div>
-
-      <input id="banReason" maxlength="120" placeholder="Reason (optional)">
-
-      <div class="admin-actions">
-        <button id="banNameButton" class="danger" type="button">BAN NAME</button>
-        <button id="refreshBansButton" class="blue" type="button">REFRESH BANS</button>
-      </div>
-
-      <h3 style="color:#ef4444">ACTIVE BANS</h3>
-      <div id="adminBans"></div>
-
-      <hr style="border:1px solid #334155;margin:18px 0">
-
-      <section class="replay-section">
-        <h3>REPLAY CENTER</h3>
-        <p class="replay-info">
-          View complete game replays and inspect every recorded jump.
-        </p>
-
-        <div class="admin-actions">
-          <button id="refreshReplaysButton" class="blue" type="button">REFRESH REPLAYS</button>
-        </div>
-
-        <div id="adminReplays">No replays loaded.</div>
-
-        <hr style="border:1px solid #334155;margin:15px 0">
-
-        <h3>REPLAY PLAYER</h3>
-
-        <p id="replaySelectedInfo" class="replay-info">
-          Select a replay to start viewing.
-        </p>
-
-        <canvas id="replayCanvas" width="400" height="560"></canvas>
-
-        <p id="replayFrameInfo" class="replay-info">No replay selected.</p>
-
-        <input id="replaySlider" type="range" min="0" max="0" value="0" disabled>
-
-        <div class="replay-controls">
-          <button id="replayPlayButton" type="button" disabled>PLAY</button>
-          <button id="replayPauseButton" type="button" disabled>PAUSE</button>
-          <button id="replayPreviousJump" type="button" disabled>PREVIOUS JUMP</button>
-          <button id="replayNextJump" type="button" disabled>NEXT JUMP</button>
-        </div>
-
-        <h3>JUMP ANALYSIS</h3>
-        <div id="replayJumps">
-          Select a replay to view its jumps.
-        </div>
-      </section>
-
-    </section>
-
-    <p id="adminStatus"></p>
   </div>
 
 </div>
@@ -552,31 +305,13 @@ const status = document.getElementById("status");
 const intro = document.getElementById("intro");
 const introStart = document.getElementById("introStart");
 const introCountdown = document.getElementById("introCountdown");
+
 const startupMusic = document.getElementById("startupMusic");
 const gameMusic = document.getElementById("gameMusic");
 const musicToggle = document.getElementById("musicToggle");
 
-const adminPanel = document.getElementById("adminPanel");
-const adminLogin = document.getElementById("adminLogin");
-const adminContent = document.getElementById("adminContent");
-const adminCodeInput = document.getElementById("adminCodeInput");
-const adminStatus = document.getElementById("adminStatus");
-const adminScores = document.getElementById("adminScores");
-const adminBans = document.getElementById("adminBans");
-const adminReplays = document.getElementById("adminReplays");
-
-const replayCanvas = document.getElementById("replayCanvas");
-const replayCtx = replayCanvas.getContext("2d");
-const replaySlider = document.getElementById("replaySlider");
-const replayFrameInfo = document.getElementById("replayFrameInfo");
-const replaySelectedInfo = document.getElementById("replaySelectedInfo");
-const replayJumps = document.getElementById("replayJumps");
-
-let adminCode = "";
-let adminLoggedIn = false;
-
 // ============================================
-// SAFE LOCAL STORAGE
+// LOCAL STORAGE
 // ============================================
 
 function safeGet(key) {
@@ -600,9 +335,11 @@ n.value = safeGet("flappy_name");
 let playerId = safeGet("flappy_player_id");
 
 if (!playerId) {
-  playerId = (crypto.randomUUID
-    ? crypto.randomUUID()
-    : "player-" + Date.now() + "-" + Math.random().toString(36).slice(2));
+  playerId = (
+    crypto.randomUUID
+      ? crypto.randomUUID()
+      : "player-" + Date.now() + "-" + Math.random().toString(36).slice(2)
+  );
 
   safeSet("flappy_player_id", playerId);
 }
@@ -634,7 +371,7 @@ function startGameMusic() {
   });
 }
 
-async function toggleMusic() {
+function toggleMusic() {
   musicEnabled = !musicEnabled;
   updateMusicButton();
 
@@ -717,6 +454,7 @@ let score = 0;
 let over = true;
 let fc = 0;
 let animId = 0;
+
 let playerName = "PLAYER";
 let gameRunning = false;
 let startingGame = false;
@@ -741,7 +479,6 @@ let replayRecording = false;
 
 function recordReplayEvent(event) {
   if (!replayRecording) return;
-
   if (replayEvents.length >= 24999) return;
 
   replayEvents.push({
@@ -752,10 +489,8 @@ function recordReplayEvent(event) {
 
 function captureReplayFrame(force = false) {
   if (!replayRecording || !bird) return;
-
   if (!force && fc % replayStride !== 0) return;
 
-  // Increase the interval if the replay approaches the storage limit.
   if (replayKeyframes.length >= 2900 && replayStride < 1000) {
     replayStride = Math.min(replayStride * 2, 1000);
   }
@@ -906,7 +641,6 @@ async function saveScore(name, newScore) {
 
   const runIdToSave = currentRunId;
 
-  // Save the replay first. A replay error must not prevent score saving.
   try {
     replayRecording = false;
 
@@ -984,7 +718,6 @@ async function start() {
   if (gameRunning || startingGame) return;
 
   startingGame = true;
-
   startGameMusic();
 
   try {
@@ -1009,7 +742,6 @@ async function start() {
 
     currentRunId = runResult.runId;
 
-    // Prepare a new replay.
     resetReplayRecording();
 
     gameRunning = true;
@@ -1045,7 +777,6 @@ async function start() {
 
     setStatus("Have fun playing!");
 
-    // Save the starting position.
     captureReplayFrame(true);
 
     cancelAnimationFrame(animId);
@@ -1107,7 +838,6 @@ function flap(event) {
       lives
     });
 
-    // Save an exact frame for every jump.
     captureReplayFrame(true);
   }
 }
@@ -1120,7 +850,6 @@ function loseLife(cause = "unknown") {
   if (over || invulnerable || respawning) return;
 
   const livesBefore = lives;
-
   lives--;
 
   recordReplayEvent({
@@ -1137,17 +866,14 @@ function loseLife(cause = "unknown") {
     return;
   }
 
-  // Reset the bird position.
   bird.y = 250;
   bird.v = 0;
 
-  // Temporary protection after respawning.
   invulnerable = true;
   invulnerableTimer = 100;
   respawning = true;
   respawnTimer = 35;
 
-  // Remove nearby obstacles.
   pipes = pipes.filter(p => p.x > bird.x + 100);
 
   captureReplayFrame(true);
@@ -1164,6 +890,7 @@ function die() {
 
   over = true;
   gameRunning = false;
+
   gameMusic.pause();
   gameMusic.currentTime = 0;
 
@@ -1173,7 +900,6 @@ function die() {
     lives
   });
 
-  // Save the final game state.
   captureReplayFrame(true);
 
   t.textContent = "GAME OVER";
@@ -1203,7 +929,6 @@ function loop() {
 
   ctx.clearRect(0, 0, 400, 560);
 
-  // Respawn timer.
   if (respawning) {
     respawnTimer--;
 
@@ -1212,7 +937,6 @@ function loop() {
     }
   }
 
-  // Invulnerability timer.
   if (invulnerable) {
     invulnerableTimer--;
 
@@ -1221,7 +945,6 @@ function loop() {
     }
   }
 
-  // Move bird.
   if (!respawning) {
     bird.v += bird.g;
     bird.y += bird.v;
@@ -1253,7 +976,6 @@ function loop() {
     ctx.fillRect(p.x, 0, p.w, p.top);
     ctx.fillRect(p.x, p.bot, p.w, 560 - p.bot);
 
-    // Obstacle collision.
     if (
       !invulnerable &&
       !respawning &&
@@ -1287,7 +1009,7 @@ function loop() {
 
   if (over) return;
 
-  // Top and bottom boundary collision.
+  // Boundary collision.
   if (
     !invulnerable &&
     !respawning &&
@@ -1305,7 +1027,6 @@ function loop() {
     ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
     ctx.fill();
 
-    // Eye.
     ctx.fillStyle = "#fff";
     ctx.beginPath();
     ctx.arc(bird.x + 5, bird.y - 4, 4, 0, Math.PI * 2);
@@ -1317,7 +1038,7 @@ function loop() {
     ctx.fill();
   }
 
-  // Draw score.
+  // Score.
   ctx.fillStyle = "#fff";
   ctx.font = "bold 26px monospace";
   ctx.textAlign = "center";
@@ -1325,7 +1046,6 @@ function loop() {
 
   drawLives();
 
-  // Respawn message.
   if (respawning) {
     ctx.fillStyle = "#38bdf8";
     ctx.font = "bold 18px monospace";
@@ -1335,7 +1055,6 @@ function loop() {
 
   fc++;
 
-  // Periodic replay snapshot.
   captureReplayFrame(false);
 
   animId = requestAnimationFrame(loop);
@@ -1359,8 +1078,6 @@ document.addEventListener("keydown", function(event) {
     event.code === "Space" ||
     event.code === "ArrowUp"
   ) {
-    if (!adminPanel.classList.contains("hidden")) return;
-
     event.preventDefault();
 
     if (!ui.classList.contains("hidden")) {
@@ -1369,860 +1086,7 @@ document.addEventListener("keydown", function(event) {
       flap();
     }
   }
-
-  // ADMIN: CTRL + ALT + E
-  if (
-    event.ctrlKey &&
-    event.altKey &&
-    event.code === "KeyE"
-  ) {
-    event.preventDefault();
-    openAdminPanel();
-  }
-
-  if (event.key === "Escape") {
-    closeAdminPanel();
-  }
 });
-
-// ============================================
-// ADMIN PANEL
-// ============================================
-
-function openAdminPanel() {
-  adminPanel.classList.remove("hidden");
-  adminLogin.classList.remove("hidden");
-  adminContent.classList.add("hidden");
-  adminStatus.textContent = "";
-  adminCodeInput.value = "";
-}
-
-function closeAdminPanel() {
-  adminPanel.classList.add("hidden");
-  stopReplayPlayback();
-}
-
-// ============================================
-// ADMIN REQUEST
-// ============================================
-
-async function adminRequest(action, extra = {}) {
-  if (!db) {
-    throw new Error("Supabase is unavailable.");
-  }
-
-  const { data, error } = await db.functions.invoke("admin-boas", {
-    body: {
-      action,
-      adminCode,
-      ...extra
-    }
-  });
-
-  if (error) {
-    let details = "";
-    let httpStatus = "unknown";
-
-    try {
-      if (error.context) {
-        httpStatus = error.context.status || "unknown";
-
-        if (typeof error.context.clone === "function") {
-          details = await error.context.clone().text();
-        }
-      }
-    } catch (readError) {
-      console.error("Could not read error details:", readError);
-    }
-
-    console.error("Admin HTTP status:", httpStatus);
-    console.error("Admin server response:", details);
-    console.error("Full admin error:", error);
-
-    throw new Error(
-      "Admin function error " + httpStatus + ": " +
-      (details || error.message)
-    );
-  }
-
-  if (!data || data.error || data.success === false) {
-    throw new Error(data?.error || "Admin action failed.");
-  }
-
-  return data;
-}
-
-// ============================================
-// ADMIN LOGIN
-// ============================================
-
-document.getElementById("adminLoginButton")
-  .addEventListener("click", async () => {
-    const enteredCode = adminCodeInput.value;
-
-    if (!enteredCode) {
-      adminStatus.textContent = "Enter your admin code.";
-      return;
-    }
-
-    adminStatus.textContent = "Checking...";
-
-    try {
-      adminCode = enteredCode;
-
-      await adminRequest("verify");
-
-      adminLoggedIn = true;
-      adminLogin.classList.add("hidden");
-      adminContent.classList.remove("hidden");
-
-      adminStatus.textContent = "Successfully logged in.";
-
-      await refreshAdminScores();
-      await refreshAdminBans();
-      await refreshAdminReplays();
-
-    } catch (error) {
-      adminCode = "";
-      adminLoggedIn = false;
-      adminStatus.textContent = error.message;
-    }
-  });
-
-// ============================================
-// ADMIN SCORES
-// ============================================
-
-async function refreshAdminScores() {
-  if (!adminLoggedIn) return;
-
-  adminStatus.textContent = "Loading scores...";
-
-  try {
-    const result = await adminRequest("list-scores");
-    adminScores.innerHTML = "";
-
-    if (!result.scores || result.scores.length === 0) {
-      adminScores.textContent = "No scores found.";
-    }
-
-    (result.scores || []).forEach(item => {
-      const row = document.createElement("div");
-      row.className = "admin-row";
-
-      const info = document.createElement("p");
-      info.textContent =
-        "ID: " + item.id + " | " + item.name + " | Score: " + item.score;
-
-      const edit = document.createElement("button");
-      edit.className = "blue";
-      edit.textContent = "EDIT";
-
-      edit.addEventListener("click", async () => {
-        const newName = prompt("New name:", item.name);
-        if (newName === null) return;
-
-        const newScore = prompt("New score:", item.score);
-        if (newScore === null) return;
-
-        try {
-          await adminRequest("update-score", {
-            id: String(item.id),
-            name: newName,
-            score: newScore
-          });
-
-          adminStatus.textContent = "Score updated.";
-          await refreshAdminScores();
-          await loadLeaderboard();
-
-        } catch (error) {
-          adminStatus.textContent = error.message;
-        }
-      });
-
-      const remove = document.createElement("button");
-      remove.className = "danger";
-      remove.textContent = "DELETE";
-
-      remove.addEventListener("click", async () => {
-        if (!confirm("Delete this score?")) return;
-
-        try {
-          await adminRequest("delete-score", {
-            id: String(item.id)
-          });
-
-          adminStatus.textContent = "Score deleted.";
-          await refreshAdminScores();
-          await loadLeaderboard();
-
-        } catch (error) {
-          adminStatus.textContent = error.message;
-        }
-      });
-
-      row.appendChild(info);
-      row.appendChild(edit);
-      row.appendChild(remove);
-      adminScores.appendChild(row);
-    });
-
-    adminStatus.textContent = "Scores loaded.";
-
-  } catch (error) {
-    adminStatus.textContent = error.message;
-  }
-}
-
-// ============================================
-// BAN LIST
-// ============================================
-
-function formatBanExpiry(expiresAt) {
-  if (!expiresAt) return "Permanent";
-
-  const date = new Date(expiresAt);
-  return "Until " + date.toLocaleString("en-GB");
-}
-
-async function refreshAdminBans() {
-  if (!adminLoggedIn) return;
-
-  try {
-    const result = await adminRequest("list-bans");
-    adminBans.innerHTML = "";
-
-    const playerBans = (result.bans || []).map(item => ({
-      kind: "player",
-      id: item.id,
-      label: item.player_name || item.player_id,
-      detail: "Player ID: " + item.player_id,
-      reason: item.reason,
-      expiresAt: item.expires_at
-    }));
-
-    const nameBans = (result.nameBans || []).map(item => ({
-      kind: "name",
-      id: item.id,
-      label: item.player_name,
-      detail: "Player name ban",
-      reason: item.reason,
-      expiresAt: item.expires_at
-    }));
-
-    const allBans = [...nameBans, ...playerBans];
-
-    if (allBans.length === 0) {
-      adminBans.textContent = "No active bans.";
-      return;
-    }
-
-    allBans.forEach(item => {
-      const row = document.createElement("div");
-      row.className = "admin-row";
-
-      const info = document.createElement("p");
-      info.textContent =
-        item.label + " — " + item.detail +
-        " — " + formatBanExpiry(item.expiresAt) +
-        (item.reason ? " — Reason: " + item.reason : "");
-
-      const remove = document.createElement("button");
-      remove.className = "danger";
-      remove.textContent = "UNBAN";
-
-      remove.addEventListener("click", async () => {
-        if (!confirm("Remove the ban for " + item.label + "?")) return;
-
-        try {
-          if (item.kind === "name") {
-            await adminRequest("unban-name", {
-              playerName: item.label
-            });
-          } else {
-            const matchingBan = (result.bans || []).find(x => x.id === item.id);
-
-            if (!matchingBan) {
-              throw new Error("Could not find this player ban.");
-            }
-
-            await adminRequest("unban-player", {
-              playerId: matchingBan.player_id
-            });
-          }
-
-          adminStatus.textContent = "Ban removed.";
-          await refreshAdminBans();
-
-        } catch (error) {
-          adminStatus.textContent = error.message;
-        }
-      });
-
-      row.appendChild(info);
-      row.appendChild(remove);
-      adminBans.appendChild(row);
-    });
-
-    adminStatus.textContent = "Ban list loaded.";
-
-  } catch (error) {
-    adminBans.textContent = "Could not load bans: " + error.message;
-    adminStatus.textContent = error.message;
-  }
-}
-
-// ============================================
-// CUSTOM BAN DURATION
-// ============================================
-
-document.getElementById("banDuration").addEventListener("change", event => {
-  document.getElementById("customBanFields")
-    .classList.toggle("hidden", event.target.value !== "custom");
-});
-
-// ============================================
-// BAN PLAYER BY NAME
-// ============================================
-
-document.getElementById("banNameButton").addEventListener("click", async () => {
-  const playerNameToBan = document.getElementById("banName").value
-    .replace(/[^a-zA-Z0-9_-]/g, "")
-    .slice(0, 10)
-    .toUpperCase();
-
-  const durationChoice = document.getElementById("banDuration").value;
-  const reason = document.getElementById("banReason").value;
-
-  if (!playerNameToBan) {
-    adminStatus.textContent = "Enter a valid player name.";
-    return;
-  }
-
-  const permanent = durationChoice === "permanent";
-  let durationMinutes = null;
-
-  if (!permanent && durationChoice === "custom") {
-    const amount = Number(document.getElementById("customBanAmount").value);
-    const unit = document.getElementById("customBanUnit").value;
-
-    if (!Number.isInteger(amount) || amount < 1) {
-      adminStatus.textContent = "Enter a valid custom duration.";
-      return;
-    }
-
-    const multiplier = unit === "days" ? 1440 :
-      unit === "hours" ? 60 : 1;
-
-    durationMinutes = amount * multiplier;
-
-    if (durationMinutes > 525600) {
-      adminStatus.textContent = "The maximum ban duration is 365 days.";
-      return;
-    }
-
-  } else if (!permanent) {
-    durationMinutes = Number(durationChoice);
-  }
-
-  if (!confirm(
-    "Ban player " + playerNameToBan +
-    (permanent ? " permanently?" : " for " + durationMinutes + " minutes?")
-  )) return;
-
-  try {
-    adminStatus.textContent = "Setting ban...";
-
-    await adminRequest("ban-name", {
-      playerName: playerNameToBan,
-      durationMinutes,
-      permanent,
-      reason
-    });
-
-    document.getElementById("banName").value = "";
-    document.getElementById("banReason").value = "";
-
-    adminStatus.textContent = playerNameToBan + " has been banned.";
-
-    await refreshAdminBans();
-
-  } catch (error) {
-    adminStatus.textContent = "Ban failed: " + error.message;
-  }
-});
-
-// ============================================
-// REFRESH BAN LIST
-// ============================================
-
-document.getElementById("refreshBansButton")
-  .addEventListener("click", refreshAdminBans);
-
-// ============================================
-// ADD SCORE
-// ============================================
-
-document.getElementById("addScoreButton")
-  .addEventListener("click", async () => {
-    const name = document.getElementById("newName").value;
-    const scoreValue = document.getElementById("newScore").value;
-
-    if (!name.trim() || scoreValue === "") {
-      adminStatus.textContent = "Enter a name and score.";
-      return;
-    }
-
-    try {
-      await adminRequest("add-score", {
-        name,
-        score: scoreValue
-      });
-
-      document.getElementById("newName").value = "";
-      document.getElementById("newScore").value = "";
-
-      adminStatus.textContent = "Score added.";
-
-      await refreshAdminScores();
-      await loadLeaderboard();
-
-    } catch (error) {
-      adminStatus.textContent = error.message;
-    }
-  });
-
-// ============================================
-// REFRESH SCORES
-// ============================================
-
-document.getElementById("refreshScoresButton")
-  .addEventListener("click", refreshAdminScores);
-
-// ============================================
-// REPLAY CENTER - LOAD REPLAY LIST
-// ============================================
-
-let currentReplay = null;
-let currentReplayIndex = 0;
-let replayInterval = null;
-let currentReplayJumpIndex = -1;
-
-function stopReplayPlayback() {
-  if (replayInterval) {
-    clearInterval(replayInterval);
-    replayInterval = null;
-  }
-}
-
-async function refreshAdminReplays() {
-  if (!adminLoggedIn) return;
-
-  adminReplays.textContent = "Loading replays...";
-
-  try {
-    const result = await adminRequest("list-replays");
-    const replays = result.replays || [];
-
-    adminReplays.innerHTML = "";
-
-    if (replays.length === 0) {
-      adminReplays.textContent = "No replays found yet.";
-      return;
-    }
-
-    replays.forEach(replay => {
-      const row = document.createElement("div");
-      row.className = "admin-row";
-
-      const info = document.createElement("p");
-
-      const dateText = replay.created_at
-        ? new Date(replay.created_at).toLocaleString("en-GB")
-        : "Unknown date";
-
-      info.textContent =
-        "Player ID: " + replay.player_id +
-        " | Score: " + (replay.score ?? "Not listed") +
-        " | Jumps: " + replay.jump_count +
-        " | " + dateText;
-
-      const viewButton = document.createElement("button");
-      viewButton.className = "blue";
-      viewButton.textContent = "VIEW REPLAY";
-
-      viewButton.addEventListener("click", () => {
-        loadAdminReplay(replay.run_id);
-      });
-
-      row.appendChild(info);
-      row.appendChild(viewButton);
-      adminReplays.appendChild(row);
-    });
-
-    adminStatus.textContent = "Replays loaded.";
-
-  } catch (error) {
-    adminReplays.textContent = "Could not load replays: " + error.message;
-    adminStatus.textContent = error.message;
-  }
-}
-
-// ============================================
-// LOAD A SINGLE REPLAY
-// ============================================
-
-async function loadAdminReplay(runId) {
-  if (!adminLoggedIn) return;
-
-  stopReplayPlayback();
-
-  adminStatus.textContent = "Loading replay...";
-
-  try {
-    const result = await adminRequest("get-replay", {
-      runId
-    });
-
-    const replay = result.replay || result;
-
-    if (!replay || !Array.isArray(replay.keyframes)) {
-      throw new Error("The replay data is missing or invalid.");
-    }
-
-    currentReplay = replay;
-    currentReplayIndex = 0;
-    currentReplayJumpIndex = -1;
-
-    const events = Array.isArray(replay.events) ? replay.events : [];
-    const jumps = events.filter(event => event.type === "jump");
-
-    replaySelectedInfo.textContent =
-      "Run: " + runId +
-      " | Total ticks: " + replay.duration_ticks +
-      " | Recorded jumps: " + jumps.length;
-
-    replaySlider.disabled = false;
-    replaySlider.min = "0";
-    replaySlider.max = String(Math.max(0, replay.keyframes.length - 1));
-    replaySlider.value = "0";
-
-    document.getElementById("replayPlayButton").disabled = false;
-    document.getElementById("replayPauseButton").disabled = false;
-    document.getElementById("replayPreviousJump").disabled = jumps.length === 0;
-    document.getElementById("replayNextJump").disabled = jumps.length === 0;
-
-    renderReplayFrame(0);
-    renderReplayJumpList();
-
-    adminStatus.textContent = "Replay loaded successfully.";
-
-  } catch (error) {
-    console.error("Replay loading failed:", error);
-    adminStatus.textContent = "Could not load replay: " + error.message;
-  }
-}
-
-// ============================================
-// DRAW REPLAY FRAME
-// ============================================
-
-function renderReplayFrame(index) {
-  if (!currentReplay || !Array.isArray(currentReplay.keyframes)) return;
-
-  const frames = currentReplay.keyframes;
-
-  if (frames.length === 0) return;
-
-  currentReplayIndex = Math.max(0, Math.min(index, frames.length - 1));
-
-  const frame = frames[currentReplayIndex];
-
-  replayCtx.clearRect(0, 0, 400, 560);
-
-  // Background.
-  replayCtx.fillStyle = "#0f172a";
-  replayCtx.fillRect(0, 0, 400, 560);
-
-  // Obstacles.
-  replayCtx.fillStyle = "#22c55e";
-
-  (frame.pipes || []).forEach(pipe => {
-    replayCtx.fillRect(pipe.x, 0, pipe.w || 52, pipe.top);
-    replayCtx.fillRect(
-      pipe.x,
-      pipe.bot,
-      pipe.w || 52,
-      560 - pipe.bot
-    );
-  });
-
-  // Bird.
-  const birdX = Number(frame.x ?? 90);
-  const birdY = Number(frame.y ?? 250);
-
-  replayCtx.fillStyle = "#facc15";
-  replayCtx.beginPath();
-  replayCtx.arc(birdX, birdY, 14, 0, Math.PI * 2);
-  replayCtx.fill();
-
-  // Bird eye.
-  replayCtx.fillStyle = "#fff";
-  replayCtx.beginPath();
-  replayCtx.arc(birdX + 5, birdY - 4, 4, 0, Math.PI * 2);
-  replayCtx.fill();
-
-  replayCtx.fillStyle = "#020617";
-  replayCtx.beginPath();
-  replayCtx.arc(birdX + 6, birdY - 4, 2, 0, Math.PI * 2);
-  replayCtx.fill();
-
-  // Score.
-  replayCtx.fillStyle = "#fff";
-  replayCtx.font = "bold 26px monospace";
-  replayCtx.textAlign = "center";
-  replayCtx.fillText(String(frame.score ?? 0), 200, 45);
-
-  // Lives.
-  replayCtx.font = "bold 22px monospace";
-  replayCtx.textAlign = "left";
-  replayCtx.fillStyle = "#ef4444";
-
-  let hearts = "";
-
-  for (let i = 0; i < 3; i++) {
-    hearts += i < (frame.lives ?? 3) ? "♥ " : "♡ ";
-  }
-
-  replayCtx.fillText(hearts, 12, 38);
-
-  // Respawn indicator.
-  if (frame.resp) {
-    replayCtx.fillStyle = "#38bdf8";
-    replayCtx.font = "bold 18px monospace";
-    replayCtx.textAlign = "center";
-    replayCtx.fillText("RESPAWNING", 200, 300);
-  }
-
-  // Replay information.
-  replayFrameInfo.textContent =
-    "Frame " + (currentReplayIndex + 1) + "/" + frames.length +
-    " | Tick: " + frame.tick +
-    " | Score: " + (frame.score ?? 0) +
-    " | Lives: " + (frame.lives ?? 0);
-
-  replaySlider.value = String(currentReplayIndex);
-}
-
-// ============================================
-// REPLAY PLAYBACK
-// ============================================
-
-function playReplay() {
-  if (!currentReplay || !currentReplay.keyframes.length) return;
-
-  stopReplayPlayback();
-
-  if (currentReplayIndex >= currentReplay.keyframes.length - 1) {
-    renderReplayFrame(0);
-  }
-
-  replayInterval = setInterval(() => {
-    if (!currentReplay) {
-      stopReplayPlayback();
-      return;
-    }
-
-    if (currentReplayIndex >= currentReplay.keyframes.length - 1) {
-      stopReplayPlayback();
-      return;
-    }
-
-    renderReplayFrame(currentReplayIndex + 1);
-  }, 100);
-}
-
-document.getElementById("replayPlayButton")
-  .addEventListener("click", playReplay);
-
-document.getElementById("replayPauseButton")
-  .addEventListener("click", stopReplayPlayback);
-
-// ============================================
-// REPLAY SLIDER
-// ============================================
-
-replaySlider.addEventListener("input", () => {
-  stopReplayPlayback();
-  renderReplayFrame(Number(replaySlider.value));
-});
-
-// ============================================
-// JUMP ANALYSIS LIST
-// ============================================
-
-function renderReplayJumpList() {
-  replayJumps.innerHTML = "";
-
-  if (!currentReplay) {
-    replayJumps.textContent = "No replay selected.";
-    return;
-  }
-
-  const events = Array.isArray(currentReplay.events)
-    ? currentReplay.events
-    : [];
-
-  const jumps = events.filter(event => event.type === "jump");
-
-  if (jumps.length === 0) {
-    replayJumps.textContent = "No jumps were recorded.";
-    return;
-  }
-
-  jumps.forEach((jump, index) => {
-    const row = document.createElement("div");
-    row.className = "jump-row";
-
-    const info = document.createElement("span");
-
-    const seconds = (Number(jump.tick || 0) / 60).toFixed(2);
-
-    info.textContent =
-      "Jump " + (index + 1) +
-      " | Tick: " + jump.tick +
-      " | Approx. time: " + seconds + "s" +
-      " | Score: " + (jump.score ?? 0) +
-      " | Bird Y: " + (jump.y ?? "?");
-
-    const button = document.createElement("button");
-    button.className = "blue";
-    button.textContent = "VIEW";
-
-    button.addEventListener("click", () => {
-      stopReplayPlayback();
-
-      currentReplayJumpIndex = index;
-
-      const matchingFrameIndex = currentReplay.keyframes.findIndex(frame =>
-        Number(frame.tick) === Number(jump.tick)
-      );
-
-      if (matchingFrameIndex >= 0) {
-        renderReplayFrame(matchingFrameIndex);
-      } else {
-        const nearestIndex = findNearestReplayFrame(jump.tick);
-        renderReplayFrame(nearestIndex);
-      }
-    });
-
-    row.appendChild(info);
-    row.appendChild(button);
-    replayJumps.appendChild(row);
-  });
-}
-
-// ============================================
-// FIND NEAREST REPLAY FRAME
-// ============================================
-
-function findNearestReplayFrame(tick) {
-  if (!currentReplay || !currentReplay.keyframes.length) return 0;
-
-  let bestIndex = 0;
-  let bestDifference = Infinity;
-
-  currentReplay.keyframes.forEach((frame, index) => {
-    const difference = Math.abs(Number(frame.tick) - Number(tick));
-
-    if (difference < bestDifference) {
-      bestDifference = difference;
-      bestIndex = index;
-    }
-  });
-
-  return bestIndex;
-}
-
-// ============================================
-// PREVIOUS AND NEXT JUMP
-// ============================================
-
-function jumpToReplayEvent(direction) {
-  if (!currentReplay) return;
-
-  const events = Array.isArray(currentReplay.events)
-    ? currentReplay.events
-    : [];
-
-  const jumps = events.filter(event => event.type === "jump");
-
-  if (jumps.length === 0) return;
-
-  if (currentReplayJumpIndex < 0) {
-    currentReplayJumpIndex = 0;
-  } else {
-    currentReplayJumpIndex += direction;
-  }
-
-  currentReplayJumpIndex = Math.max(
-    0,
-    Math.min(jumps.length - 1, currentReplayJumpIndex)
-  );
-
-  const jump = jumps[currentReplayJumpIndex];
-  const frameIndex = findNearestReplayFrame(jump.tick);
-
-  stopReplayPlayback();
-  renderReplayFrame(frameIndex);
-}
-
-document.getElementById("replayPreviousJump")
-  .addEventListener("click", () => jumpToReplayEvent(-1));
-
-document.getElementById("replayNextJump")
-  .addEventListener("click", () => jumpToReplayEvent(1));
-
-// ============================================
-// REFRESH REPLAYS
-// ============================================
-
-document.getElementById("refreshReplaysButton")
-  .addEventListener("click", refreshAdminReplays);
-
-// ============================================
-// ADMIN LOGOUT
-// ============================================
-
-document.getElementById("adminLogoutButton")
-  .addEventListener("click", () => {
-    stopReplayPlayback();
-
-    adminCode = "";
-    adminLoggedIn = false;
-
-    adminBans.innerHTML = "";
-    adminScores.innerHTML = "";
-    adminReplays.innerHTML = "";
-
-    currentReplay = null;
-    replayJumps.textContent = "Select a replay to view its jumps.";
-    replaySelectedInfo.textContent = "Select a replay to start viewing.";
-    replayFrameInfo.textContent = "No replay selected.";
-
-    adminLogin.classList.remove("hidden");
-    adminContent.classList.add("hidden");
-
-    adminPanel.classList.add("hidden");
-  });
-
-// ============================================
-// CLOSE ADMIN PANEL
-// ============================================
-
-document.getElementById("adminCloseLogin")
-  .addEventListener("click", closeAdminPanel);
 
 // ============================================
 // ERROR HANDLING
