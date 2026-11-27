@@ -1,467 +1,575 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flappy Arcade — Admin</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#090d18;--panel:#111827;--border:#26334a;--text:#f4f7ff;--muted:#8290a8;--blue:#4388ff;--green:#27d69b;--red:#ff5570}
-body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
-button,input,select{font:inherit}
-button{cursor:pointer;border:0}
-.login{position:fixed;inset:0;z-index:10;display:flex;justify-content:center;align-items:center;background:var(--bg)}
-.login-card{width:min(390px,90%);background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:35px;text-align:center}
-.logo{font-size:25px;font-weight:800;margin-bottom:8px}
-.subtitle{color:var(--muted);font-size:13px;margin-bottom:25px}
-input,select{width:100%;padding:13px;border:1px solid var(--border);border-radius:9px;background:#0c1423;color:white;outline:none;margin-bottom:12px}
-input:focus,select:focus{border-color:var(--blue)}
-.primary{background:var(--blue);color:white;padding:13px 18px;border-radius:9px;font-weight:bold}
-.primary:hover{filter:brightness(1.12)}
-.login .primary{width:100%}
-.error{color:var(--red);font-size:13px;margin-top:12px}
-.app{display:none;height:100vh}
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:225px;padding:25px 15px;background:#0d1422;border-right:1px solid var(--border)}
-.brand{font-size:19px;font-weight:800;padding:5px 12px 35px}
-.brand span{color:var(--blue)}
-.nav-label{color:var(--muted);font-size:10px;letter-spacing:2px;padding:0 12px;margin-bottom:12px}
-.nav button{display:block;width:100%;text-align:left;background:transparent;color:var(--muted);padding:13px;border-radius:9px;margin-bottom:5px;font-size:13px}
-.nav button.active,.nav button:hover{background:#1b2b47;color:white}
-.sidebar-bottom{position:absolute;bottom:20px;left:15px;right:15px}
-.status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;padding:12px}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
-.logout{width:100%;padding:12px;color:var(--red);background:#291723;border-radius:9px}
-.main{margin-left:225px;height:100vh;padding:30px;overflow:hidden}
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
-.topbar h1{font-size:25px}
-.topbar p{color:var(--muted);font-size:12px;margin-top:5px}
-.admin-tag{background:#172b49;color:#7eafff;border:1px solid #284a79;padding:9px 13px;border-radius:20px;font-size:12px}
-.screen{display:none;height:calc(100vh - 115px);overflow:auto}
-.screen.active{display:block}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
-.stat{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px}
-.stat p{color:var(--muted);font-size:12px;margin-bottom:13px}
-.stat h2{font-size:30px}
-.blue{color:var(--blue)}.green{color:var(--green)}.red{color:var(--red)}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:16px}
-.panel-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-.panel-heading h2{font-size:16px}
-.muted{color:var(--muted);font-size:12px}
-.table{width:100%;border-collapse:collapse;font-size:13px}
-.table th{color:var(--muted);font-weight:normal;text-align:left;padding:12px 8px;border-bottom:1px solid var(--border)}
-.table td{padding:14px 8px;border-bottom:1px solid #202c40}
-.table tr:last-child td{border-bottom:0}
-.empty{color:var(--muted);text-align:center;padding:25px;font-size:13px}
-.badge{display:inline-block;padding:5px 9px;border-radius:20px;font-size:11px}
-.online{background:#12352d;color:var(--green)}
-.action{background:#263a5c;color:white;padding:8px 12px;border-radius:7px;font-size:12px}
-.danger{background:#421d2a;color:#ff8a9d}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-.form-grid input,.form-grid select{margin-bottom:0}
-.full{grid-column:1/-1}
-.message{font-size:12px;color:var(--muted);margin-top:13px;min-height:16px}
-.settings-info{color:var(--muted);font-size:13px;line-height:1.8}
-@media(max-width:700px){
-.sidebar{width:68px;padding:15px 7px}
-.brand{font-size:0;padding:8px 10px 30px}
-.brand span{font-size:20px}
-.nav-label,.nav button span,.status,.logout{display:none}
-.nav button{text-align:center;padding:14px 5px;font-size:18px}
-.main{margin-left:68px;padding:18px 12px}
-.stats{grid-template-columns:1fr;gap:8px}
-.stat{padding:13px}
-.stat h2{font-size:22px}
-.topbar h1{font-size:19px}
-.admin-tag{font-size:10px}
-.form-grid{grid-template-columns:1fr}
-.full{grid-column:auto}
-.table{font-size:11px}
-.table th,.table td{padding:10px 4px}
-}
-</style>
-</head>
-<body>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flappy Arcade - Admin</title>
 
-<div class="login" id="login">
-  <div class="login-card">
-    <div class="logo">FLAPPY <span style="color:#4388ff">ARCADE</span></div>
-    <div class="subtitle">ADMIN CONTROL PANEL</div>
-    <input id="adminCode" type="password" placeholder="Enter admin code">
-    <button class="primary" onclick="loginAdmin()">ACCESS PANEL</button>
-    <div class="error" id="loginError"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 25px 15px;
+      background: #080f1d;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: 0 auto;
+    }
+
+    h1 { color: #00e5ff; }
+    h2 { color: #00e5ff; }
+
+    .panel {
+      background: #111d30;
+      border: 1px solid #263b56;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      border-radius: 8px;
+      border: 1px solid #344b68;
+      background: #091525;
+      color: white;
+      font-size: 15px;
+    }
+
+    button {
+      background: #00bcd4;
+      color: #00131a;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover { background: #45eafa; }
+
+    button.danger {
+      background: #e53935;
+      color: white;
+    }
+
+    button.secondary {
+      background: #344b68;
+      color: white;
+    }
+
+    .small-button {
+      width: auto;
+      padding: 8px 12px;
+      margin-right: 5px;
+    }
+
+    .hidden { display: none !important; }
+
+    .message {
+      padding: 12px;
+      border-radius: 8px;
+      margin: 12px 0;
+      background: #1d344c;
+      overflow-wrap: anywhere;
+    }
+
+    .error { background: #542323; }
+    .success { background: #17452e; }
+
+    .score-item, .ban-item {
+      background: #0a1728;
+      border: 1px solid #263b56;
+      border-radius: 10px;
+      padding: 13px;
+      margin: 10px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .score-item strong, .ban-item strong {
+      color: #00e5ff;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .actions button { width: auto; }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .checkbox-row input {
+      width: auto;
+      margin: 0;
+    }
+
+    .muted { color: #a9bad0; font-size: 13px; }
+
+    @media (max-width: 600px) {
+      body { padding: 12px; }
+      .panel { padding: 14px; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <h1>FLAPPY ARCADE</h1>
+  <p class="muted">Beheerderspaneel</p>
+
+  <div id="loginPanel" class="panel">
+    <h2>Admin login</h2>
+    <p>Voer je beheerderscode in.</p>
+
+    <input id="adminCodeInput" type="password"
+           placeholder="Admin code"
+           autocomplete="current-password">
+
+    <button id="loginButton">Inloggen</button>
+    <div id="loginMessage" class="message hidden"></div>
+  </div>
+
+  <div id="adminPanel" class="hidden">
+
+    <div class="panel">
+      <h2>Dashboard</h2>
+      <p>Je bent ingelogd op het Flappy Arcade-beheer.</p>
+      <button id="refreshButton">Alles vernieuwen</button>
+      <button id="logoutButton" class="secondary">Uitloggen</button>
+      <div id="statusMessage" class="message hidden"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Score toevoegen</h2>
+      <input id="newName" type="text" maxlength="30"
+             placeholder="Spelersnaam">
+      <input id="newScore" type="number" min="0"
+             placeholder="Score">
+      <button id="addScoreButton">Score toevoegen</button>
+    </div>
+
+    <div class="panel">
+      <h2>Scores beheren</h2>
+      <div id="scoresList">Scores laden...</div>
+    </div>
+
+    <div class="panel">
+      <h2>Spelernaam blokkeren</h2>
+
+      <input id="banName" type="text" maxlength="30"
+             placeholder="Spelersnaam">
+
+      <select id="banDuration">
+        <option value="10">10 minuten</option>
+        <option value="60">1 uur</option>
+        <option value="1440">1 dag</option>
+        <option value="10080">7 dagen</option>
+        <option value="43200">30 dagen</option>
+      </select>
+
+      <div class="checkbox-row">
+        <input id="permanentBan" type="checkbox">
+        <label for="permanentBan">Permanent blokkeren</label>
+      </div>
+
+      <input id="banReason" type="text" maxlength="200"
+             placeholder="Reden (optioneel)">
+
+      <button id="banButton" class="danger">Naam blokkeren</button>
+    </div>
+
+    <div class="panel">
+      <h2>Geblokkeerde namen</h2>
+      <div id="nameBansList">Blokkeringen laden...</div>
+    </div>
+
+    <div class="panel">
+      <h2>Geblokkeerde spelers</h2>
+      <div id="playerBansList">Blokkeringen laden...</div>
+    </div>
+
   </div>
 </div>
 
-<div class="app" id="app">
-  <aside class="sidebar">
-    <div class="brand">FLAPPY <span>ADMIN</span></div>
-    <div class="nav-label">MAIN MENU</div>
-    <nav class="nav">
-      <button class="active" onclick="showScreen('dashboard',this)">◫ <span>Dashboard</span></button>
-      <button onclick="showScreen('players',this)">◉ <span>Players</span></button>
-      <button onclick="showScreen('bans',this)">⛔ <span>Bans</span></button>
-      <button onclick="showScreen('scores',this)">★ <span>Score Management</span></button>
-      <button onclick="showScreen('settings',this)">⚙ <span>Settings</span></button>
-    </nav>
-    <div class="sidebar-bottom">
-      <div class="status"><span class="dot"></span>Connected to Supabase</div>
-      <button class="logout" onclick="logoutAdmin()">Log out</button>
-    </div>
-  </aside>
+<script>
+  const SUPABASE_URL = "https://ilgdnvtdmzjrclybbexi.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_6kZmesu_W4jgVmDKDw6v8Q_Y5SlesV0";
 
-  <main class="main">
-    <header class="topbar">
-      <div>
-        <h1 id="pageTitle">Dashboard</h1>
-        <p>Flappy Arcade administration</p>
-      </div>
-      <div class="admin-tag">ADMIN SESSION</div>
-    </header>
+  const db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
-    <section class="screen active" id="dashboard">
-      <div class="stats">
-        <div class="stat"><p>ONLINE PLAYERS</p><h2 class="blue" id="onlineCount">0</h2></div>
-        <div class="stat"><p>ACTIVE BANS</p><h2 class="red" id="banCount">0</h2></div>
-        <div class="stat"><p>CONNECTION</p><h2 class="green" style="font-size:20px">ONLINE</h2></div>
-      </div>
-      <div class="panel">
-        <div class="panel-heading"><h2>Live activity</h2><span class="muted">Live presence</span></div>
-        <div id="dashboardActivity" class="empty">Waiting for player activity...</div>
-      </div>
-      <div class="panel">
-        <div class="panel-heading"><h2>System status</h2></div>
-        <table class="table">
-          <tr><td>Supabase Edge Function</td><td><span class="badge online">Connected</span></td></tr>
-          <tr><td>Admin authentication</td><td><span class="badge online">Verified</span></td></tr>
-          <tr><td>Live player presence</td><td><span class="badge online">Listening</span></td></tr>
-        </table>
-      </div>
-    </section>
+  let adminCode = "";
 
-    <section class="screen" id="players">
-      <div class="panel">
-        <div class="panel-heading"><h2>Live players</h2><span class="muted" id="playerRefresh">Updating...</span></div>
-        <table class="table">
-          <thead><tr><th>PLAYER</th><th>STATUS</th></tr></thead>
-          <tbody id="playersTable"><tr><td colspan="2" class="empty">Waiting for players...</td></tr></tbody>
-        </table>
-      </div>
-    </section>
+  const $ = id => document.getElementById(id);
 
-    <section class="screen" id="bans">
-      <div class="panel">
-        <div class="panel-heading"><h2>Ban a player</h2><span class="muted">Temporary ban</span></div>
-        <div class="form-grid">
-          <input id="banPlayerId" placeholder="Player ID">
-          <input id="banPlayerName" placeholder="Player name">
-          <select id="banDuration">
-            <option value="10">10 minutes</option>
-            <option value="60">1 hour</option>
-            <option value="1440">24 hours</option>
-            <option value="10080">7 days</option>
-            <option value="43200">30 days</option>
-            <option value="525600">1 year</option>
-          </select>
-          <input id="banReason" placeholder="Reason for ban">
-          <button class="primary full" onclick="banPlayer()">BAN PLAYER</button>
-        </div>
-        <div class="message" id="banMessage"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-heading"><h2>Active bans</h2><button class="action" onclick="loadBans()">Refresh</button></div>
-        <table class="table">
-          <thead><tr><th>PLAYER</th><th>EXPIRES</th><th>ACTION</th></tr></thead>
-          <tbody id="bansTable"><tr><td colspan="3" class="empty">Loading bans...</td></tr></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="screen" id="scores">
-      <div class="panel">
-        <div class="panel-heading">
-          <h2>Add a leaderboard score</h2>
-          <span class="muted">Admin score entry</span>
-        </div>
-        <p class="muted" style="line-height:1.6;margin-bottom:18px">
-          This creates a new separate score. Existing scores are not changed.
-          The score is added directly to the real leaderboard.
-        </p>
-        <div class="form-grid">
-          <input id="scorePlayerName" maxlength="10" placeholder="Player name (max 10 characters)">
-          <input id="scoreValue" type="number" min="0" max="10000" step="1" placeholder="Score">
-          <button class="primary full" id="addScoreButton" onclick="addLeaderboardScore()">ADD SCORE TO LEADERBOARD</button>
-        </div>
-        <div class="message" id="scoreMessage"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-heading"><h2>How it works</h2></div>
-        <p class="settings-info">
-          Every admin score is stored as a new row in the flappy_scores table.
-          It does not overwrite or combine with any previous score.
-          Your normal Top 5 leaderboard will rank it with all other scores.
-        </p>
-      </div>
-    </section>
-
-    <section class="screen" id="settings">
-      <div class="panel">
-        <div class="panel-heading"><h2>Admin settings</h2></div>
-        <div class="settings-info">
-          <p><strong>Application:</strong> Flappy Arcade</p>
-          <p><strong>Backend:</strong> Supabase Edge Functions</p>
-          <p><strong>Admin endpoint:</strong> admin-boas</p>
-          <p><strong>Session:</strong> Authenticated</p>
-          <p><strong>Security:</strong> Admin code is kept in memory only.</p>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-heading"><h2>Session</h2></div>
-        <p class="muted" style="margin-bottom:15px">Logging out clears the admin code from this page.</p>
-        <button class="primary" onclick="logoutAdmin()">LOG OUT</button>
-      </div>
-    </section>
-  </main>
-</div>
-
-<script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const SUPABASE_URL = "https://ilgdnvtdmzjrclybbexi.supabase.co";
-const SUPABASE_KEY = "sb_publishable_6kZmesu_W4jgVmDKDw6v8Q_Y5SlesV0";
-const FUNCTION_URL = SUPABASE_URL + "/functions/v1/admin-boas";
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-let adminCode = "";
-let presenceChannel = null;
-let activePlayers = [];
-
-async function callAdmin(action, extra = {}) {
-  const response = await fetch(FUNCTION_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "apikey": SUPABASE_KEY
-    },
-    body: JSON.stringify({ action, adminCode, ...extra })
-  });
-
-  const result = await response.json();
-  if (!response.ok) throw new Error(result.error || "Request failed.");
-  return result;
-}
-
-window.loginAdmin = async function() {
-  const code = document.getElementById("adminCode").value;
-  const errorBox = document.getElementById("loginError");
-  errorBox.textContent = "";
-  if (!code) {
-    errorBox.textContent = "Enter your admin code.";
-    return;
+  function showMessage(element, message, type = "") {
+    element.textContent = message;
+    element.className = "message" + (type ? " " + type : "");
+    element.classList.remove("hidden");
   }
 
-  adminCode = code;
-  try {
-    await callAdmin("verify");
-    document.getElementById("login").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    await loadBans();
-    connectPresence();
-  } catch (error) {
-    adminCode = "";
-    errorBox.textContent = error.message;
+  function hideMessage(element) {
+    element.classList.add("hidden");
   }
-};
 
-window.logoutAdmin = function() {
-  adminCode = "";
-  if (presenceChannel) {
-    supabase.removeChannel(presenceChannel);
-    presenceChannel = null;
-  }
-  document.getElementById("app").style.display = "none";
-  document.getElementById("login").style.display = "flex";
-  document.getElementById("adminCode").value = "";
-  document.getElementById("loginError").textContent = "";
-};
-
-window.showScreen = function(screen, button) {
-  document.querySelectorAll(".screen").forEach(el => el.classList.remove("active"));
-  document.querySelectorAll(".nav button").forEach(el => el.classList.remove("active"));
-  document.getElementById(screen).classList.add("active");
-  button.classList.add("active");
-
-  const titles = {
-    dashboard: "Dashboard",
-    players: "Players",
-    bans: "Bans",
-    scores: "Score Management",
-    settings: "Settings"
-  };
-
-  document.getElementById("pageTitle").textContent = titles[screen];
-  if (screen === "bans") loadBans();
-};
-
-function connectPresence() {
-  if (presenceChannel) supabase.removeChannel(presenceChannel);
-
-  presenceChannel = supabase.channel("flappy-live", {
-    config: { presence: { key: "admin-panel" } }
-  });
-
-  presenceChannel
-    .on("presence", { event: "sync" }, () => {
-      const state = presenceChannel.presenceState();
-      activePlayers = [];
-
-      for (const [key, entries] of Object.entries(state)) {
-        for (const entry of entries) {
-          if (key === "admin-panel") continue;
-          activePlayers.push({ key, ...entry });
-        }
+  async function api(action, extra = {}) {
+    const { data, error } = await db.functions.invoke("admin-boas", {
+      body: {
+        action,
+        adminCode,
+        ...extra
       }
-      renderPlayers();
-    })
-    .subscribe();
-}
+    });
 
-function renderPlayers() {
-  const table = document.getElementById("playersTable");
-  document.getElementById("onlineCount").textContent = activePlayers.length;
+    if (error) {
+      let details = error.message || "Er ging iets mis.";
 
-  if (activePlayers.length === 0) {
-    table.innerHTML = '<tr><td colspan="2" class="empty">No players currently online.</td></tr>';
-    document.getElementById("dashboardActivity").textContent = "No players currently online.";
-    document.getElementById("playerRefresh").textContent = "0 players online";
-    return;
+      try {
+        const response = await error.context.clone().json();
+        if (response.error) details = response.error;
+      } catch (_) {}
+
+      throw new Error(details);
+    }
+
+    if (data && data.error) {
+      throw new Error(data.error);
+    }
+
+    return data || {};
   }
 
-  table.innerHTML = "";
-  activePlayers.slice(0, 8).forEach(player => {
-    const row = document.createElement("tr");
-    const nameCell = document.createElement("td");
-    nameCell.textContent = String(player.name || player.playerName || player.key);
-    const statusCell = document.createElement("td");
-    statusCell.innerHTML = '<span class="badge online">ONLINE</span>';
-    row.append(nameCell, statusCell);
-    table.appendChild(row);
-  });
+  function makeText(tag, value) {
+    const element = document.createElement(tag);
+    element.textContent = value == null ? "" : String(value);
+    return element;
+  }
 
-  document.getElementById("dashboardActivity").textContent =
-    activePlayers.length + " player(s) currently online.";
-  document.getElementById("playerRefresh").textContent =
-    activePlayers.length + " players online";
-}
+  function makeButton(label, className, callback) {
+    const button = document.createElement("button");
+    button.textContent = label;
+    button.className = "small-button " + (className || "");
+    button.addEventListener("click", callback);
+    return button;
+  }
 
-window.loadBans = async function() {
-  const table = document.getElementById("bansTable");
-  try {
-    const result = await callAdmin("list-bans");
-    const bans = result.bans || [];
-    document.getElementById("banCount").textContent = bans.length;
+  async function login() {
+    const code = $("adminCodeInput").value.trim();
 
-    if (bans.length === 0) {
-      table.innerHTML = '<tr><td colspan="3" class="empty">No active bans.</td></tr>';
+    if (!code) {
+      showMessage($("loginMessage"), "Vul je admincode in.", "error");
       return;
     }
 
-    table.innerHTML = "";
-    bans.slice(0, 5).forEach(ban => {
-      const row = document.createElement("tr");
-      const nameCell = document.createElement("td");
-      nameCell.textContent = ban.player_name || ban.player_id;
-      const expiryCell = document.createElement("td");
-      expiryCell.textContent = new Date(ban.expires_at).toLocaleString();
-      const actionCell = document.createElement("td");
-      const button = document.createElement("button");
-      button.className = "action danger";
-      button.textContent = "Unban";
-      button.addEventListener("click", () => unbanPlayer(ban.player_id));
-      actionCell.appendChild(button);
-      row.append(nameCell, expiryCell, actionCell);
-      table.appendChild(row);
+    $("loginButton").disabled = true;
+    $("loginButton").textContent = "Controleren...";
+
+    try {
+      adminCode = code;
+      await api("verify");
+
+      $("loginPanel").classList.add("hidden");
+      $("adminPanel").classList.remove("hidden");
+      $("adminCodeInput").value = "";
+
+      showMessage($("statusMessage"), "Succesvol ingelogd.", "success");
+      await refreshAll();
+
+    } catch (error) {
+      adminCode = "";
+      showMessage($("loginMessage"), error.message, "error");
+    } finally {
+      $("loginButton").disabled = false;
+      $("loginButton").textContent = "Inloggen";
+    }
+  }
+
+  function logout() {
+    adminCode = "";
+    $("adminPanel").classList.add("hidden");
+    $("loginPanel").classList.remove("hidden");
+    $("adminCodeInput").value = "";
+    hideMessage($("statusMessage"));
+    showMessage($("loginMessage"), "Je bent uitgelogd.");
+  }
+
+  async function refreshAll() {
+    $("scoresList").textContent = "Scores laden...";
+    $("nameBansList").textContent = "Blokkeringen laden...";
+    $("playerBansList").textContent = "Blokkeringen laden...";
+
+    try {
+      await Promise.all([
+        loadScores(),
+        loadBans()
+      ]);
+
+      showMessage($("statusMessage"), "Gegevens vernieuwd.", "success");
+    } catch (error) {
+      showMessage($("statusMessage"), error.message, "error");
+    }
+  }
+
+  async function loadScores() {
+    const data = await api("list-scores");
+    const scores = data.scores || data.data || [];
+    const container = $("scoresList");
+
+    container.replaceChildren();
+
+    if (!scores.length) {
+      container.textContent = "Er zijn nog geen scores.";
+      return;
+    }
+
+    scores.forEach(score => {
+      const item = document.createElement("div");
+      item.className = "score-item";
+
+      const info = document.createElement("div");
+      info.append(
+        makeText("strong", score.name || "Onbekend"),
+        makeText("div", "Score: " + score.score),
+        makeText("div", "ID: " + score.id)
+      );
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+
+      actions.append(
+        makeButton("Bewerken", "", () => editScore(score)),
+        makeButton("Verwijderen", "danger", () => deleteScore(score.id))
+      );
+
+      item.append(info, actions);
+      container.append(item);
     });
-  } catch (error) {
-    table.innerHTML = "";
-    const row = document.createElement("tr");
-    const cell = document.createElement("td");
-    cell.colSpan = 3;
-    cell.className = "empty";
-    cell.textContent = error.message;
-    row.appendChild(cell);
-    table.appendChild(row);
-  }
-};
-
-window.banPlayer = async function() {
-  const message = document.getElementById("banMessage");
-  const playerId = document.getElementById("banPlayerId").value.trim();
-  const playerName = document.getElementById("banPlayerName").value.trim();
-  const durationMinutes = Number(document.getElementById("banDuration").value);
-  const reason = document.getElementById("banReason").value.trim();
-
-  if (!playerId) {
-    message.textContent = "Enter a player ID.";
-    return;
   }
 
-  try {
-    await callAdmin("ban-player", { playerId, playerName, durationMinutes, reason });
-    message.textContent = "Player successfully banned.";
-    document.getElementById("banPlayerId").value = "";
-    document.getElementById("banPlayerName").value = "";
-    document.getElementById("banReason").value = "";
-    await loadBans();
-  } catch (error) {
-    message.textContent = error.message;
-  }
-};
+  async function addScore() {
+    const name = $("newName").value.trim();
+    const score = Number($("newScore").value);
 
-window.unbanPlayer = async function(playerId) {
-  if (!confirm("Are you sure you want to unban this player?")) return;
-  try {
-    await callAdmin("unban-player", { playerId });
-    await loadBans();
-  } catch (error) {
-    alert(error.message);
-  }
-};
+    if (!name || !Number.isInteger(score) || score < 0) {
+      showMessage($("statusMessage"),
+        "Vul een geldige naam en score in.", "error");
+      return;
+    }
 
-window.addLeaderboardScore = async function() {
-  const message = document.getElementById("scoreMessage");
-  const button = document.getElementById("addScoreButton");
-  const name = document.getElementById("scorePlayerName").value.trim();
-  const scoreText = document.getElementById("scoreValue").value.trim();
-  const score = Number(scoreText);
-
-  message.textContent = "";
-
-  if (!name || name.length > 10 || !/^[a-zA-Z0-9_-]+$/.test(name)) {
-    message.textContent = "Enter a valid name (1–10 letters, numbers, _ or -).";
-    return;
+    try {
+      await api("add-score", { name, score });
+      $("newName").value = "";
+      $("newScore").value = "";
+      await loadScores();
+      showMessage($("statusMessage"), "Score toegevoegd.", "success");
+    } catch (error) {
+      showMessage($("statusMessage"), error.message, "error");
+    }
   }
 
-  if (scoreText === "" || !Number.isInteger(score) || score < 0 || score > 10000) {
-    message.textContent = "Enter a whole-number score from 0 to 10000.";
-    return;
+  async function editScore(score) {
+    const name = prompt("Nieuwe spelersnaam:", score.name || "");
+    if (name === null) return;
+
+    const scoreValue = prompt("Nieuwe score:", score.score);
+    if (scoreValue === null) return;
+
+    const cleanName = name.trim();
+    const newScore = Number(scoreValue);
+
+    if (!cleanName || !Number.isInteger(newScore) || newScore < 0) {
+      showMessage($("statusMessage"),
+        "Ongeldige naam of score.", "error");
+      return;
+    }
+
+    try {
+      await api("update-score", {
+        id: score.id,
+        name: cleanName,
+        score: newScore
+      });
+
+      await loadScores();
+      showMessage($("statusMessage"), "Score bijgewerkt.", "success");
+    } catch (error) {
+      showMessage($("statusMessage"), error.message, "error");
+    }
   }
 
-  button.disabled = true;
-  button.textContent = "ADDING SCORE...";
+  async function deleteScore(id) {
+    if (!confirm("Weet je zeker dat je deze score wilt verwijderen?")) {
+      return;
+    }
 
-  try {
-    await callAdmin("admin-add-score", { name, score });
-    message.textContent = "Success! A new score was added to the real leaderboard.";
-    document.getElementById("scorePlayerName").value = "";
-    document.getElementById("scoreValue").value = "";
-  } catch (error) {
-    message.textContent = "Could not add score: " + error.message;
-  } finally {
-    button.disabled = false;
-    button.textContent = "ADD SCORE TO LEADERBOARD";
+    try {
+      await api("delete-score", { id });
+      await loadScores();
+      showMessage($("statusMessage"), "Score verwijderd.", "success");
+    } catch (error) {
+      showMessage($("statusMessage"), error.message, "error");
+    }
   }
-};
+
+  async function banName() {
+    const playerName = $("banName").value.trim();
+    const permanent = $("permanentBan").checked;
+    const durationMinutes = Number($("banDuration").value);
+    const reason = $("banReason").value.trim();
+
+    if (!playerName) {
+      showMessage($("statusMessage"),
+        "Vul een spelersnaam in.", "error");
+      return;
+    }
+
+    try {
+      await api("ban-name", {
+        playerName,
+        durationMinutes,
+        permanent,
+        reason
+      });
+
+      $("banName").value = "";
+      $("banReason").value = "";
+      $("permanentBan").checked = false;
+
+      await loadBans();
+      showMessage($("statusMessage"),
+        "Spelersnaam geblokkeerd.", "success");
+    } catch (error) {
+      showMessage($("statusMessage"), error.message, "error");
+    }
+  }
+
+  async function loadBans() {
+    const data = await api("list-bans");
+
+    const nameBans = data.nameBans || [];
+    const playerBans = data.bans || [];
+
+    renderNameBans(nameBans);
+    renderPlayerBans(playerBans);
+  }
+
+  function renderNameBans(bans) {
+    const container = $("nameBansList");
+    container.replaceChildren();
+
+    if (!bans.length) {
+      container.textContent = "Geen geblokkeerde namen.";
+      return;
+    }
+
+    bans.forEach(ban => {
+      const item = document.createElement("div");
+      item.className = "ban-item";
+
+      item.append(
+        makeText("strong", ban.player_name || "Onbekend"),
+        makeText("div", "Reden: " + (ban.reason || "Geen reden opgegeven")),
+        makeText("div", "Verloopt: " + (ban.expires_at || "Permanent"))
+      );
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+
+      actions.append(
+        makeButton("Deblokkeren", "danger", async () => {
+          if (!confirm("Deze naam deblokkeren?")) return;
+
+          try {
+            await api("unban-name", {
+              playerName: ban.player_name
+            });
+            await loadBans();
+            showMessage($("statusMessage"),
+              "Naam gedeblokkeerd.", "success");
+          } catch (error) {
+            showMessage($("statusMessage"), error.message, "error");
+          }
+        })
+      );
+
+      item.append(actions);
+      container.append(item);
+    });
+  }
+
+  function renderPlayerBans(bans) {
+    const container = $("playerBansList");
+    container.replaceChildren();
+
+    if (!bans.length) {
+      container.textContent = "Geen geblokkeerde spelers.";
+      return;
+    }
+
+    bans.forEach(ban => {
+      const item = document.createElement("div");
+      item.className = "ban-item";
+
+      item.append(
+        makeText("strong", ban.player_name || "Onbekend"),
+        makeText("div", "Speler-ID: " + (ban.player_id || "")),
+        makeText("div", "Reden: " + (ban.reason || "Geen reden opgegeven")),
+        makeText("div", "Verloopt: " + (ban.expires_at || "Permanent"))
+      );
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+
+      actions.append(
+        makeButton("Speler deblokkeren", "danger", async () => {
+          if (!confirm("Deze speler deblokkeren?")) return;
+
+          try {
+            await api("unban-player", {
+              playerId: ban.player_id
+            });
+            await loadBans();
+            showMessage($("statusMessage"),
+              "Speler gedeblokkeerd.", "success");
+          } catch (error) {
+            showMessage($("statusMessage"), error.message, "error");
+          }
+        })
+      );
+
+      item.append(actions);
+      container.append(item);
+    });
+  }
+
+  $("loginButton").addEventListener("click", login);
+  $("adminCodeInput").addEventListener("keydown", event => {
+    if (event.key === "Enter") login();
+  });
+
+  $("logoutButton").addEventListener("click", logout);
+  $("refreshButton").addEventListener("click", refreshAll);
+  $("addScoreButton").addEventListener("click", addScore);
+  $("banButton").addEventListener("click", banName);
 </script>
 </body>
 </html>
